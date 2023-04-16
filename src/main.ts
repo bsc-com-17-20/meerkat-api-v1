@@ -6,10 +6,17 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle('Meerkat example')
-    .setDescription('The meerkat API description')
+    .setTitle('Meerkat API')
+    .setDescription(
+      'MeerKat-forum is an online space for open discussion, debate, and information ' +
+        'sharing related to academic and social issues within the UNIMA community.',
+    )
     .setVersion('1.0')
     .addTag('meerkat')
+    .addTag('forum')
+    .addTag('api')
+    .addTag('mysql')
+    .addTag('node')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
