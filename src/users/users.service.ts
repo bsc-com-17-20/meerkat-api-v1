@@ -28,4 +28,8 @@ export class UsersService {
       { ...updateUserDetails, updatedAt: new Date() },
     );
   }
+
+  deleteuser(id: number) {
+    return this.userRepository.delete({ id });
+  }
 }
