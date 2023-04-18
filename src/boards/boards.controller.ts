@@ -9,6 +9,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { BoardsService } from './boards.service';
+import { CreateBoardDto } from './dtos';
 
 @Controller('boards')
 export class BoardsController {
@@ -16,11 +17,13 @@ export class BoardsController {
 
   @Get()
   async getBoards() {
-    await this.boardsService.fetchUsers();
+    return await this.boardsService.fetchBoards();
   }
 
   @Post()
-  createBoard() {}
+  async createBoard(@Body() createBoardDto: CreateBoardDto) {
+    return await this.boardsService.createBoard(createBoardDto);
+  }
 
   @Patch(':id')
   updateBoard(@Param('id', ParseIntPipe) id: number) {}
