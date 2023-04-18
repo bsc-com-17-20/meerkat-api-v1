@@ -11,6 +11,11 @@ async function bootstrap() {
       'MeerKat-forum is an online space for open discussion, debate, and information ' +
         'sharing related to academic and social issues within the UNIMA community.',
     )
+    .setContact(
+      'Benedict Zuze',
+      'https://github.com/bsc-com-17-20',
+      'bsc-com-17-20@unima.ac.mw',
+    )
     .setVersion('1.0')
     .addTag('meerkat')
     .build();
