@@ -8,11 +8,16 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import { BoardsService } from './boards.service';
 
 @Controller('boards')
 export class BoardsController {
+  constructor(private boardsService: BoardsService) {}
+
   @Get()
-  getBoards() {}
+  async getBoards() {
+    await this.boardsService.fetchUsers();
+  }
 
   @Post()
   createBoard() {}
