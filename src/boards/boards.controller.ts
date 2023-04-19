@@ -9,7 +9,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { BoardsService } from './boards.service';
-import { CreateBoardDto } from './dtos';
+import { CreateBoardDto, EditBoardDto } from './dtos';
 
 @Controller('boards')
 export class BoardsController {
@@ -26,8 +26,15 @@ export class BoardsController {
   }
 
   @Patch(':id')
-  updateBoard(@Param('id', ParseIntPipe) id: number) {}
+  async updateBoard(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() editBoardDto: EditBoardDto,
+  ) {
+    return await this.boardsService.updateBoard(id, editBoardDto);
+  }
 
   @Delete(':id')
-  deleteBoard(@Param('id', ParseIntPipe) id: number) {}
+  async deleteBoard(@Param('id', ParseIntPipe) id: number) {
+    return await this.boardsService.deleteBoard(id);
+  }
 }
