@@ -6,18 +6,22 @@ import { UsersModule } from './users/users.module';
 import { User } from './users/models/users.entity';
 import { BoardsModule } from './boards/boards.module';
 import { Board } from './boards/model/boards.entity';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: '',
-      database: 'meerkat_v1',
-      entities: [User, Board],
-      synchronize: true,
+    ConfigModule.forRoot(),
+    TypeOrmModule.forRootAsync({
+      useFactory: () => ({
+        type: 'mysql',
+        host: 'localhost',
+        port: 3306,
+        username: process.env.DATABASE_USER,
+        password: process.env.DATABASE_PASSWORD,
+        database: process.env.DATABASE_NAME,
+        entities: [User, Board],
+        synchronize: true,
+      }),
     }),
     UsersModule,
     BoardsModule,
