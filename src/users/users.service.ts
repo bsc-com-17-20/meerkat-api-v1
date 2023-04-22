@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './models/users.entity';
 import { Repository } from 'typeorm';
-import { CreateUserParams } from 'src/utils/types';
 import { CreateUserDto, UpdateUserDto } from './dtos';
 
 @Injectable()
@@ -14,6 +13,10 @@ export class UsersService {
 
   fetchUsers() {
     return this.userRepository.find();
+  }
+
+  fetchUser(id: number) {
+    return this.userRepository.findOneBy({ id });
   }
 
   createUser(userDetails: CreateUserDto) {
