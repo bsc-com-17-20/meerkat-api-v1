@@ -36,7 +36,7 @@ describe('UsersService', () => {
     it('should create a new user an return it', async () => {
       const expectedResponse: User = {
         id: expect.any(Number),
-        name: 'john',
+        username: 'john',
         email: 'john@email.com',
         hash: '123',
         createdAt: new Date(),
@@ -47,9 +47,9 @@ describe('UsersService', () => {
       jest.spyOn(userRepository, 'save').mockResolvedValue(expectedResponse);
 
       const result = await service.createUser({
-        name: 'john',
+        username: 'john',
         email: 'john@email.com',
-        hash: '123',
+        password: '123',
       });
       console.log(result);
 
