@@ -9,7 +9,7 @@ export class User {
   role: string;
 
   @Column('varchar', { length: 30, unique: true })
-  name: string;
+  username: string;
 
   @Column()
   email: string;
@@ -20,6 +20,6 @@ export class User {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
 
-  @Column({ unique: true })
+  @Column()
   hash: string;
 }

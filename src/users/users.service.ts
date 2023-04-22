@@ -19,9 +19,22 @@ export class UsersService {
     return this.userRepository.findOneBy({ id });
   }
 
+  async findOne(username: string) {
+    this.logger.log(username);
+    const peek = await this.userRepository.findOneBy({ username });
+    this.logger.log(peek + 'hey');
+    return this.userRepository.findOneBy({ username });
+  }
+
   createUser(userDetails: CreateUserDto) {
     this.logger.log({ ...userDetails });
-    const newUser = this.userRepository.create({ ...userDetails });
+    const user = {
+      username: userDetails.username,
+      email: userDetails.email,
+      hash: userDetails.password,
+    };
+    this.logger.log({ ...user });
+    const newUser = this.userRepository.create({ ...user });
     return this.userRepository.save(newUser);
   }
 
