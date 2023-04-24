@@ -9,6 +9,7 @@ import { Board } from './boards/model/boards.entity';
 import { ConfigModule } from '@nestjs/config';
 import { PostsModule } from './posts/posts.module';
 import { Post } from './posts/models/posts.entity';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { Post } from './posts/models/posts.entity';
     UsersModule,
     BoardsModule,
     PostsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
