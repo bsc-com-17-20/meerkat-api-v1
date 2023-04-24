@@ -4,11 +4,13 @@ import {
   Logger,
   Post,
   Request,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { LocalAuthGuard, JwtAuthGuard } from './guards';
 import { AuthService } from './auth.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -21,8 +23,11 @@ export class AuthController {
   })
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Request() req) {
+  async login(@Request() req, @Res({ passthrough: true }) res: Response) {
     this.logger.log(req.user);
+    const user = this.authService.login(req.user);
+    const token = (await user).access_token;
+    res.cookie('token', `${token}`, { signed: true });
     return this.authService.login(req.user);
   }
 
