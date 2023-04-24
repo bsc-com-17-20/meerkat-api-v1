@@ -7,6 +7,7 @@ import { User } from './users/models/users.entity';
 import { BoardsModule } from './boards/boards.module';
 import { Board } from './boards/model/boards.entity';
 import { ConfigModule } from '@nestjs/config';
+import { PostsModule } from './posts/posts.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { ConfigModule } from '@nestjs/config';
     }),
     UsersModule,
     BoardsModule,
+    PostsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
