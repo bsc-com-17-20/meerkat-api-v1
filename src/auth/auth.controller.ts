@@ -6,15 +6,19 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { LocalAuthGuard } from './local-auth.guard';
+import { LocalAuthGuard, JwtAuthGuard } from './guards';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './jwt-auth.guard';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
   constructor(private authService: AuthService) {}
 
+  @ApiTags('auth')
+  @ApiOperation({
+    description: 'Authenticates a user by providing a JWT access token',
+  })
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Request() req) {
@@ -22,6 +26,8 @@ export class AuthController {
     return this.authService.login(req.user);
   }
 
+  @ApiTags('auth')
+  @ApiOperation({ description: "Returns a user's details" })
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
