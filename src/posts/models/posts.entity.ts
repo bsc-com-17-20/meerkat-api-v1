@@ -1,5 +1,5 @@
-import { Board } from 'src/boards/model/boards.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Board } from 'src/boards/model/boards.entity';
 
 @Entity()
 export class Post {
@@ -18,6 +18,6 @@ export class Post {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
 
-  @ManyToOne(() => Board, (board) => board.posts)
+  @ManyToOne(() => Board, (board) => board.posts, { nullable: false })
   board: Board;
 }

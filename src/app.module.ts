@@ -8,6 +8,7 @@ import { BoardsModule } from './boards/boards.module';
 import { Board } from './boards/model/boards.entity';
 import { ConfigModule } from '@nestjs/config';
 import { PostsModule } from './posts/posts.module';
+import { Post } from './posts/models/posts.entity';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { PostsModule } from './posts/posts.module';
         username: process.env.DATABASE_USER,
         password: process.env.DATABASE_PASSWORD,
         database: process.env.DATABASE_NAME,
-        entities: [User, Board],
+        entities: [User, Board, Post],
         synchronize: true,
       }),
     }),
