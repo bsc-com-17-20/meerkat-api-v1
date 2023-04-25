@@ -79,7 +79,7 @@ export class PostsService {
         const user = await this.userRepositoty.findOneBy({ id: userId });
         return this.postRepository.update(
           { id },
-          { ...postDetails, updatedAt: new Date(), board, user },
+          { ...postDetails, updatedAt: new Date(), edited: true, board, user },
         );
       }
       throw Error(`Error user does not own the post user id ${userId}`);
@@ -88,11 +88,17 @@ export class PostsService {
     }
   }
 
-  async deletePost(id: number) {
+  async deletePost(postId: number, userId: number) {
     try {
-      return this.postRepository.delete({ id });
+      const ownership = await this.checkUserOwnership(postId, userId);
+      if (ownership) {
+        return this.postRepository.delete({ id: postId });
+      }
+      throw Error(`Error user does not own the post user id ${userId}`);
     } catch (error) {
-      throw new Error(`Error deleting post with id ${id}: ${error.message}`);
+      throw new Error(
+        `Error deleting post with id ${userId}: ${error.message}`,
+      );
     }
   }
 
