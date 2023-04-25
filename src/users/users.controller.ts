@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  InternalServerErrorException,
+  NotFoundException,
   Param,
   ParseIntPipe,
   Patch,
@@ -20,21 +22,42 @@ export class UsersController {
   @ApiTags('users')
   @ApiOperation({ description: 'Get all users' })
   async getUsers() {
-    return await this.usersService.fetchUsers();
+    try {
+      return await this.usersService.fetchUsers();
+    } catch (error) {
+      throw new NotFoundException(`Something went wrong`, {
+        cause: error,
+        description: `${error.message}`,
+      });
+    }
   }
 
   @Get(':id')
   @ApiTags('users')
   @ApiOperation({ description: 'Get a single user using an id' })
   async getUser(@Param('id', ParseIntPipe) id: number) {
-    this.usersService.fetchUser(id);
+    try {
+      return await this.usersService.fetchUser(id);
+    } catch (error) {
+      throw new NotFoundException(`Something went wrong`, {
+        cause: error,
+        description: `${error.message}`,
+      });
+    }
   }
 
   @Post()
   @ApiTags('users')
   @ApiOperation({ description: 'Create a user' })
   async createUser(@Body() createUserDto: CreateUserDto) {
-    return await this.usersService.createUser(createUserDto);
+    try {
+      return await this.usersService.createUser(createUserDto);
+    } catch (error) {
+      throw new InternalServerErrorException('Someting went wrong', {
+        cause: error,
+        description: `${error.message}`,
+      });
+    }
   }
 
   @Patch(':id')
@@ -44,13 +67,27 @@ export class UsersController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    await this.usersService.updateUser(id, updateUserDto);
+    try {
+      return await this.usersService.updateUser(id, updateUserDto);
+    } catch (error) {
+      throw new InternalServerErrorException('Something went wrong', {
+        cause: error,
+        description: `${error.message}`,
+      });
+    }
   }
 
   @Delete(':id')
   @ApiTags('users')
   @ApiOperation({ description: 'Delete a user using an id' })
   async deleteUser(@Param('id', ParseIntPipe) id: number) {
-    await this.usersService.deleteuser(id);
+    try {
+      return await this.usersService.deleteuser(id);
+    } catch (error) {
+      throw new InternalServerErrorException('Something went wrong', {
+        cause: error,
+        description: `${error.message}`,
+      });
+    }
   }
 }

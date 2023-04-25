@@ -12,43 +12,79 @@ export class UsersService {
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
-  fetchUsers() {
-    return this.userRepository.find();
+  async fetchUsers() {
+    try {
+      const users = await this.userRepository.find();
+      return users;
+    } catch (error) {
+      throw new Error(`Error retrieving users: ${error.message}`);
+    }
   }
 
-  fetchUser(id: number) {
-    return this.userRepository.findOneBy({ id });
+  async fetchUser(id: number) {
+    try {
+      const user = await this.userRepository.findOneBy({ id });
+      if (!user) {
+        throw new Error(`User with id ${id} not found`);
+      }
+      return user;
+    } catch (error) {
+      throw new Error(`Error retrieving user with id ${id}: ${error.message}`);
+    }
   }
 
   async findOne(username: string) {
-    this.logger.log(username);
-    const peek = await this.userRepository.findOneBy({ username });
-    this.logger.log(peek + 'hey');
-    return this.userRepository.findOneBy({ username });
+    try {
+      this.logger.log(username);
+      const user = await this.userRepository.findOneBy({ username });
+      if (!user) {
+        throw new Error(`User with username ${username} not found`);
+      }
+      return user;
+    } catch (error) {
+      throw new Error(
+        `Error retrieving user with username ${username}: ${error.message}`,
+      );
+    }
   }
 
   async createUser(userDetails: CreateUserDto) {
-    this.logger.log({ ...userDetails });
-    const salt = await bcrypt.genSalt();
-    const hash = await bcrypt.hash(userDetails.password, salt);
-    const user = {
-      username: userDetails.username,
-      email: userDetails.email,
-      hash: hash,
-    };
-    this.logger.log({ ...user });
-    const newUser = this.userRepository.create({ ...user });
-    return this.userRepository.save(newUser);
+    try {
+      this.logger.log({ ...userDetails });
+      const salt = await bcrypt.genSalt();
+      const hash = await bcrypt.hash(userDetails.password, salt);
+      const user = {
+        username: userDetails.username,
+        email: userDetails.email,
+        hash: hash,
+      };
+      this.logger.log({ ...user });
+      const newUser = this.userRepository.create({ ...user });
+      await this.userRepository.save(newUser);
+      return newUser;
+    } catch (error) {
+      throw new Error(`Error creating user: ${error.message}`);
+    }
   }
 
-  updateUser(id: number, updateUserDetails: UpdateUserDto) {
-    return this.userRepository.update(
-      { id },
-      { ...updateUserDetails, updatedAt: new Date() },
-    );
+  async updateUser(id: number, updateUserDetails: UpdateUserDto) {
+    try {
+      await this.fetchUser(id);
+      return this.userRepository.update(
+        { id },
+        { ...updateUserDetails, updatedAt: new Date() },
+      );
+    } catch (error) {
+      throw new Error(`Error updating user with id ${id}: ${error.message}`);
+    }
   }
 
-  deleteuser(id: number) {
-    return this.userRepository.delete({ id });
+  async deleteuser(id: number) {
+    try {
+      await this.fetchUser(id);
+      return this.userRepository.delete({ id });
+    } catch (error) {
+      throw new Error(`Error deleting user with id: ${id}: ${error.message}`);
+    }
   }
 }

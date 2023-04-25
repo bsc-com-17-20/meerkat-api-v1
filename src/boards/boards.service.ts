@@ -10,20 +10,20 @@ export class BoardsService {
     @InjectRepository(Board) private boardRepository: Repository<Board>,
   ) {}
 
-  fetchBoards() {
+  async fetchBoards() {
     return this.boardRepository.find();
   }
 
-  createBoard(boardDetails: CreateBoardDto) {
+  async createBoard(boardDetails: CreateBoardDto) {
     const newBoard = this.boardRepository.create({ ...boardDetails });
     return this.boardRepository.save(newBoard);
   }
 
-  updateBoard(id: number, boardDetails: EditBoardDto) {
+  async updateBoard(id: number, boardDetails: EditBoardDto) {
     return this.boardRepository.update({ id }, { ...boardDetails });
   }
 
-  deleteBoard(id: number) {
+  async deleteBoard(id: number) {
     return this.boardRepository.delete({ id });
   }
 }
