@@ -10,6 +10,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PostsModule } from './posts/posts.module';
 import { Post } from './posts/models/posts.entity';
 import { AuthModule } from './auth/auth.module';
+import { RepliesModule } from './replies/replies.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { AuthModule } from './auth/auth.module';
     BoardsModule,
     PostsModule,
     AuthModule,
+    RepliesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

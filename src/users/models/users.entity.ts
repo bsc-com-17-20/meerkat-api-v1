@@ -1,4 +1,5 @@
 import { Post } from 'src/posts/models/posts.entity';
+import { Reply } from 'src/replies/models/replies.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
@@ -26,4 +27,7 @@ export class User {
 
   @OneToMany(() => Post, (post) => post.user, {})
   posts: Post[];
+
+  @OneToMany(() => Reply, (reply) => reply.user)
+  replies: Reply[];
 }
