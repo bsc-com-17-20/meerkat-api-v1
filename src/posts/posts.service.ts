@@ -2,8 +2,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './models/posts.entity';
 import { Repository } from 'typeorm';
-import { CreatePostDto } from './dtos';
+import { CreatePostDto, EditPostDto } from './dtos';
 import { Board } from 'src/boards/model/boards.entity';
+import { User } from 'src/users/models/users.entity';
 
 @Injectable()
 export class PostsService {
@@ -11,6 +12,7 @@ export class PostsService {
   constructor(
     @InjectRepository(Post) private postRepository: Repository<Post>,
     @InjectRepository(Board) private boardRepository: Repository<Board>,
+    @InjectRepository(User) private userRepositoty: Repository<User>,
   ) {}
 
   async fetchPostsByBoardId(boardId: number): Promise<Post[]> {
@@ -43,20 +45,74 @@ export class PostsService {
     }
   }
 
-  async createPost(postDetails: CreatePostDto, boardId: number): Promise<Post> {
+  async createPost(
+    postDetails: CreatePostDto,
+    boardId: number,
+    userId: number,
+  ): Promise<Post> {
     try {
       const board = await this.boardRepository.findOneBy({ id: boardId });
-      const post = {
-        title: postDetails.title,
-        content: postDetails.content,
+      const user = await this.userRepositoty.findOneBy({ id: userId });
+      const newPost = this.postRepository.create({
+        ...postDetails,
         board,
-      };
-      this.logger.log(post);
-      const newPost = this.postRepository.create({ ...post });
+        user,
+      });
       this.logger.log(newPost);
       return this.postRepository.save(newPost);
     } catch (error) {
       throw new Error(`Error creating a posts: ${error.message}`);
+    }
+  }
+
+  async updatePost(
+    id: number,
+    postDetails: EditPostDto,
+    boardId: number,
+    userId: number,
+  ) {
+    try {
+      const ownership = await this.checkUserOwnership(id, userId);
+      this.logger.log(ownership);
+      if (ownership) {
+        const board = await this.boardRepository.findOneBy({ id: boardId });
+        const user = await this.userRepositoty.findOneBy({ id: userId });
+        return this.postRepository.update(
+          { id },
+          { ...postDetails, updatedAt: new Date(), board, user },
+        );
+      }
+      throw Error(`Error user does not own the post user id ${userId}`);
+    } catch (error) {
+      throw new Error(`Error updating post with id ${id}: ${error.message}`);
+    }
+  }
+
+  async deletePost(id: number) {
+    try {
+      return this.postRepository.delete({ id });
+    } catch (error) {
+      throw new Error(`Error deleting post with id ${id}: ${error.message}`);
+    }
+  }
+
+  // Inorder for a user to delete and update a posts. We need to make sure they own the post
+  async checkUserOwnership(postId: number, userId: number): Promise<boolean> {
+    try {
+      const post = await this.postRepository.findOne({
+        where: {
+          id: postId,
+          user: {
+            id: userId,
+          },
+        },
+      });
+      if (!post) {
+        return false;
+      }
+      return true;
+    } catch (error) {
+      throw new Error('Something went wrong');
     }
   }
 }

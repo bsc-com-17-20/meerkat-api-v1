@@ -24,8 +24,6 @@ export class User {
   @Column()
   hash: string;
 
-  @OneToMany(() => Post, (post) => post.user, {
-    cascade: ['insert', 'update'],
-  })
+  @OneToMany(() => Post, (post) => post.user, {})
   posts: Post[];
 }
