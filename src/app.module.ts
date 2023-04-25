@@ -11,6 +11,7 @@ import { PostsModule } from './posts/posts.module';
 import { Post } from './posts/models/posts.entity';
 import { AuthModule } from './auth/auth.module';
 import { RepliesModule } from './replies/replies.module';
+import { Reply } from './replies/models/replies.entity';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { RepliesModule } from './replies/replies.module';
         username: process.env.DATABASE_USER,
         password: process.env.DATABASE_PASSWORD,
         database: process.env.DATABASE_NAME,
-        entities: [User, Board, Post],
+        entities: [User, Board, Post, Reply],
         synchronize: true,
       }),
     }),
