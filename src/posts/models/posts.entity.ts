@@ -1,5 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Board } from 'src/boards/model/boards.entity';
+import { User } from 'src/users/models/users.entity';
 
 @Entity()
 export class Post {
@@ -20,4 +21,7 @@ export class Post {
 
   @ManyToOne(() => Board, (board) => board.posts, { nullable: false })
   board: Board;
+
+  @ManyToOne(() => User, (user) => user.posts, { nullable: false })
+  user: User;
 }

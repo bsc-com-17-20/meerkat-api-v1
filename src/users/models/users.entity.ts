@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Post } from 'src/posts/models/posts.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class User {
@@ -22,4 +23,9 @@ export class User {
 
   @Column()
   hash: string;
+
+  @OneToMany(() => Post, (post) => post.user, {
+    cascade: ['insert', 'update'],
+  })
+  posts: Post[];
 }

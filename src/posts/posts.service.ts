@@ -24,8 +24,22 @@ export class PostsService {
       });
     } catch (error) {
       throw new Error(
-        `Error posts from board with id ${boardId}: ${error.message}`,
+        `Error retrieving posts from board with id ${boardId}: ${error.message}`,
       );
+    }
+  }
+
+  async fetchPostsByUserId(userId: number): Promise<Post[]> {
+    try {
+      return this.postRepository.find({
+        where: {
+          user: {
+            id: userId,
+          },
+        },
+      });
+    } catch (error) {
+      throw new Error(`Error retrieving users: ${error.message}`);
     }
   }
 
