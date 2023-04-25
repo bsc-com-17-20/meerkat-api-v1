@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  InternalServerErrorException,
+  NotFoundException,
   Param,
   ParseIntPipe,
   Post,
@@ -18,7 +20,14 @@ export class PostsController {
   @ApiProperty({ description: 'Gets all posts using a board id' })
   @Get(':id')
   async getAllPosts(@Param('id', ParseIntPipe) id: number) {
-    return await this.postsService.fetchPostsByBoardId(id);
+    try {
+      return await this.postsService.fetchPostsByBoardId(id);
+    } catch (error) {
+      throw new NotFoundException('Something went wrong', {
+        cause: error,
+        description: `${error.message}`,
+      });
+    }
   }
 
   @ApiTags('posts')
@@ -28,6 +37,13 @@ export class PostsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() createPostDto: CreatePostDto,
   ) {
-    return await this.postsService.createPost(createPostDto, id);
+    try {
+      return await this.postsService.createPost(createPostDto, id);
+    } catch (error) {
+      throw new InternalServerErrorException('Something went wrong', {
+        cause: error,
+        description: `${error.message}`,
+      });
+    }
   }
 }

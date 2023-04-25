@@ -14,25 +14,35 @@ export class PostsService {
   ) {}
 
   async fetchPostsByBoardId(boardId: number): Promise<Post[]> {
-    return this.postRepository.find({
-      where: {
-        board: {
-          id: boardId,
+    try {
+      return this.postRepository.find({
+        where: {
+          board: {
+            id: boardId,
+          },
         },
-      },
-    });
+      });
+    } catch (error) {
+      throw new Error(
+        `Error posts from board with id ${boardId}: ${error.message}`,
+      );
+    }
   }
 
-  async createPost(postDetails: CreatePostDto, boardId: number) {
-    const board = await this.boardRepository.findOneBy({ id: boardId });
-    const post = {
-      title: postDetails.title,
-      content: postDetails.content,
-      board,
-    };
-    this.logger.log(post);
-    const newPost = this.postRepository.create({ ...post });
-    this.logger.log(newPost);
-    return this.postRepository.save(newPost);
+  async createPost(postDetails: CreatePostDto, boardId: number): Promise<Post> {
+    try {
+      const board = await this.boardRepository.findOneBy({ id: boardId });
+      const post = {
+        title: postDetails.title,
+        content: postDetails.content,
+        board,
+      };
+      this.logger.log(post);
+      const newPost = this.postRepository.create({ ...post });
+      this.logger.log(newPost);
+      return this.postRepository.save(newPost);
+    } catch (error) {
+      throw new Error(`Error creating a posts: ${error.message}`);
+    }
   }
 }
