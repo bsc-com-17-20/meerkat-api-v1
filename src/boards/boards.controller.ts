@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  InternalServerErrorException,
+  NotFoundException,
   Param,
   ParseIntPipe,
   Patch,
@@ -22,14 +24,28 @@ export class BoardsController {
   })
   @Get()
   async getBoards() {
-    return await this.boardsService.fetchBoards();
+    try {
+      return await this.boardsService.fetchBoards();
+    } catch (error) {
+      throw new NotFoundException(`Something went wrong`, {
+        cause: error,
+        description: `${error.message}`,
+      });
+    }
   }
 
   @ApiTags('boards')
   @ApiProperty({ description: 'Creates a board' })
   @Post()
   async createBoard(@Body() createBoardDto: CreateBoardDto) {
-    return await this.boardsService.createBoard(createBoardDto);
+    try {
+      return await this.boardsService.createBoard(createBoardDto);
+    } catch (error) {
+      throw new InternalServerErrorException(`Something went wrong`, {
+        cause: error,
+        description: `${error.message}`,
+      });
+    }
   }
 
   @ApiTags('boards')
@@ -39,13 +55,27 @@ export class BoardsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() editBoardDto: EditBoardDto,
   ) {
-    return await this.boardsService.updateBoard(id, editBoardDto);
+    try {
+      return await this.boardsService.updateBoard(id, editBoardDto);
+    } catch (error) {
+      throw new InternalServerErrorException('Something went wrong', {
+        cause: error,
+        description: `${error.message}`,
+      });
+    }
   }
 
   @ApiTags('boards')
   @ApiProperty({ description: 'Deletes a board' })
   @Delete(':id')
   async deleteBoard(@Param('id', ParseIntPipe) id: number) {
-    return await this.boardsService.deleteBoard(id);
+    try {
+      return await this.boardsService.deleteBoard(id);
+    } catch (error) {
+      throw new InternalServerErrorException('Something went wrong', {
+        cause: error,
+        description: `${error.message}`,
+      });
+    }
   }
 }

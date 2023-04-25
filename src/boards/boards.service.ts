@@ -11,19 +11,37 @@ export class BoardsService {
   ) {}
 
   async fetchBoards() {
-    return this.boardRepository.find();
+    try {
+      const boards = await this.boardRepository.find();
+      return boards;
+    } catch (error) {
+      throw new Error(`Error retrieving users: ${error.message}`);
+    }
   }
 
   async createBoard(boardDetails: CreateBoardDto) {
-    const newBoard = this.boardRepository.create({ ...boardDetails });
-    return this.boardRepository.save(newBoard);
+    try {
+      const newBoard = this.boardRepository.create({ ...boardDetails });
+      await this.boardRepository.save(newBoard);
+      return newBoard;
+    } catch (error) {
+      throw new Error(`Error creating a board: ${error.message}`);
+    }
   }
 
   async updateBoard(id: number, boardDetails: EditBoardDto) {
-    return this.boardRepository.update({ id }, { ...boardDetails });
+    try {
+      return this.boardRepository.update({ id }, { ...boardDetails });
+    } catch (error) {
+      throw new Error(`Error updating board with id ${id}: ${error.message}`);
+    }
   }
 
   async deleteBoard(id: number) {
-    return this.boardRepository.delete({ id });
+    try {
+      return this.boardRepository.delete({ id });
+    } catch (error) {
+      throw new Error(`Error retrieving users: ${error.message}`);
+    }
   }
 }
