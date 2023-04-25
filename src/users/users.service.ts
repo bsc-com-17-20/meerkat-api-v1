@@ -40,6 +40,7 @@ export class UsersService {
       if (!user) {
         throw new Error(`User with username ${username} not found`);
       }
+      this.logger.log(user);
       return user;
     } catch (error) {
       throw new Error(

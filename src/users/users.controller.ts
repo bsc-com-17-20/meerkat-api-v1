@@ -9,10 +9,13 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateUserDto, UpdateUserDto } from './dtos';
 import { UsersService } from './users.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard, RolesAuthGuard } from 'src/auth/guards';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -21,6 +24,8 @@ export class UsersController {
   @Get()
   @ApiTags('users')
   @ApiOperation({ description: 'Get all users' })
+  // @Roles('admin')
+  // @UseGuards(RolesAuthGuard)
   async getUsers() {
     try {
       return await this.usersService.fetchUsers();
