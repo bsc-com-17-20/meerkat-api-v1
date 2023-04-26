@@ -14,6 +14,7 @@ import {
 import { CreateUserDto, UpdateUserDto } from './dtos';
 import { UsersService } from './users.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Public } from 'src/auth/decorators';
 
 @Controller('users')
 export class UsersController {
@@ -47,6 +48,7 @@ export class UsersController {
     }
   }
 
+  @Public()
   @Post()
   @ApiTags('users')
   @ApiOperation({ description: 'Create a user' })

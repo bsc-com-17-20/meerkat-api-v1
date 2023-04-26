@@ -4,6 +4,7 @@ import { User } from './models/users.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto, UpdateUserDto } from './dtos';
 import * as bcrypt from 'bcrypt';
+import * as download from 'image-downloader';
 
 @Injectable()
 export class UsersService {
@@ -51,17 +52,25 @@ export class UsersService {
 
   async createUser(userDetails: CreateUserDto) {
     try {
+      const options = {
+        url: `https://api.dicebear.com/6.x/thumbs/svg?seed=${userDetails.username}`,
+        dest: `../../public/avatars/${userDetails.username}.svg`,
+      };
+      const avatarPath = `/avatars/${userDetails.username}.svg`;
       this.logger.log({ ...userDetails });
       const salt = await bcrypt.genSalt();
       const hash = await bcrypt.hash(userDetails.password, salt);
       const user = {
         username: userDetails.username,
         email: userDetails.email,
+        imageURL: avatarPath,
         hash: hash,
       };
       this.logger.log({ ...user });
       const newUser = this.userRepository.create({ ...user });
       await this.userRepository.save(newUser);
+      const result = await download.image(options);
+      console.log(result.filename);
       return newUser;
     } catch (error) {
       throw new Error(`Error creating user: ${error.message}`);

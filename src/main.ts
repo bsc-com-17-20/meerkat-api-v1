@@ -15,6 +15,7 @@ async function bootstrap() {
 
   app.use(helmet());
   app.use(cookieParser(cookieSecret));
+  // serving images is for future use whenever there will be a need to incorporate image posting
   app.useStaticAssets(path.join(__dirname, '..', 'public'));
 
   const config = new DocumentBuilder()
