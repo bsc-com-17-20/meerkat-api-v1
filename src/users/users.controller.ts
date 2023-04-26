@@ -10,11 +10,18 @@ import {
   Patch,
   Post,
   UseGuards,
+  UsePipes,
 } from '@nestjs/common';
-import { CreateUserDto, UpdateUserDto } from './dtos';
+import {
+  CreateUserDto,
+  UpdateUserDto,
+  createUserSchema,
+  updateUserSchema,
+} from './dtos';
 import { UsersService } from './users.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/auth/decorators';
+import { JoiValidatorPipe } from 'src/utils/validation.pipe';
 
 @Controller('users')
 export class UsersController {
@@ -52,6 +59,7 @@ export class UsersController {
   @Post()
   @ApiTags('users')
   @ApiOperation({ description: 'Create a user' })
+  @UsePipes(new JoiValidatorPipe(createUserSchema))
   async createUser(@Body() createUserDto: CreateUserDto) {
     try {
       return await this.usersService.createUser(createUserDto);
@@ -66,6 +74,7 @@ export class UsersController {
   @Patch(':id')
   @ApiTags('users')
   @ApiOperation({ description: 'Update a user match an id' })
+  @UsePipes(new JoiValidatorPipe(updateUserSchema))
   async updateUser(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
