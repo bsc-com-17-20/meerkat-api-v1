@@ -2,11 +2,16 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+  const cookieSecret = configService.get<string>('COOKIE_SECRET');
 
-  app.use(cookieParser('secret'));
+  app.use(helmet());
+  app.use(cookieParser(cookieSecret));
 
   const config = new DocumentBuilder()
     .setTitle('Meerkat API')

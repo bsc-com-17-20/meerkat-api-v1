@@ -11,6 +11,7 @@ import { LocalAuthGuard, JwtAuthGuard } from './guards';
 import { AuthService } from './auth.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
+import { Public } from './decorators';
 
 @Controller('auth')
 export class AuthController {
@@ -21,6 +22,7 @@ export class AuthController {
   @ApiOperation({
     description: 'Authenticates a user by providing a JWT access token',
   })
+  @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Request() req, @Res({ passthrough: true }) res: Response) {

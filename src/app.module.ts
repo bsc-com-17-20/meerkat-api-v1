@@ -10,10 +10,13 @@ import { Post } from './posts/models/posts.entity';
 import { AuthModule } from './auth/auth.module';
 import { RepliesModule } from './replies/replies.module';
 import { Reply } from './replies/models/replies.entity';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './auth/guards';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       useFactory: () => ({
         type: 'mysql',
@@ -26,11 +29,21 @@ import { Reply } from './replies/models/replies.entity';
         synchronize: true,
       }),
     }),
+    ThrottlerModule.forRootAsync({
+      useFactory: () => ({
+        ttl: 60, // second -> 60 secs = 1 min
+        limit: 10, // number of requests per ttl value
+      }),
+    }),
     UsersModule,
     BoardsModule,
     PostsModule,
     AuthModule,
     RepliesModule,
+  ],
+  providers: [
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_GUARD, useClass: JwtAuthGuard },
   ],
 })
 export class AppModule {}
