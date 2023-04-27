@@ -16,7 +16,7 @@ export class Reply {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   updateAt: Date;
 
-  @Column()
+  @Column({ default: false })
   edited: boolean;
 
   @ManyToOne(() => Post, (post) => post.replies, { nullable: false })

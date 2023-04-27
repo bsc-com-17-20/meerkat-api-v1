@@ -16,7 +16,13 @@ export class UsersService {
   async fetchUsers() {
     try {
       const users = await this.userRepository.find();
-      return users;
+      let retUsers = [];
+      // removing the hash from the return users
+      users.forEach((user) => {
+        let { hash, ...result } = user;
+        retUsers.push(result);
+      });
+      return retUsers;
     } catch (error) {
       throw new Error(`Error retrieving users: ${error.message}`);
     }
@@ -24,7 +30,7 @@ export class UsersService {
 
   async fetchUser(id: number) {
     try {
-      const user = await this.userRepository.findOneBy({ id });
+      const { hash, ...user } = await this.userRepository.findOneBy({ id });
       if (!user) {
         throw new Error(`User with id ${id} not found`);
       }

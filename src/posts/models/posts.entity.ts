@@ -26,7 +26,7 @@ export class Post {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
 
-  @Column()
+  @Column({ default: false })
   edited: boolean;
 
   @ManyToOne(() => Board, (board) => board.posts, { nullable: false })

@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import * as Joi from 'joi';
 
 export const editBoardSchema = Joi.object({
@@ -7,7 +8,9 @@ export const editBoardSchema = Joi.object({
   abortEarly: false,
 });
 
-export interface EditBoardDto {
+export class EditBoardDto {
+  @ApiProperty({ example: 'Food and nutrition' })
   name: string;
+  @ApiProperty({ example: 'All things related to food and nutrition' })
   description: string;
 }

@@ -9,7 +9,6 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  UseGuards,
   UsePipes,
 } from '@nestjs/common';
 import {
@@ -19,7 +18,12 @@ import {
   updateUserSchema,
 } from './dtos';
 import { UsersService } from './users.service';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCookieAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Public } from 'src/auth/decorators';
 import { JoiValidatorPipe } from 'src/utils/validation.pipe';
 
@@ -29,7 +33,15 @@ export class UsersController {
 
   @Get()
   @ApiTags('users')
-  @ApiOperation({ description: 'Get all users' })
+  @ApiOperation({
+    summary: 'Finds all users',
+    description: 'Get all users',
+    operationId: 'fetchUsers',
+  })
+  @ApiResponse({ status: 200, description: 'Successful operation' })
+  @ApiResponse({ status: 401, description: 'Unauthorized operation' })
+  @ApiResponse({ status: 400, description: 'Invalid status value' })
+  @ApiCookieAuth()
   async getUsers() {
     try {
       return await this.usersService.fetchUsers();
@@ -43,7 +55,15 @@ export class UsersController {
 
   @Get(':id')
   @ApiTags('users')
-  @ApiOperation({ description: 'Get a single user using an id' })
+  @ApiOperation({
+    summary: 'Find user by ID',
+    description: 'Returns a single user',
+    operationId: 'fetchUser',
+  })
+  @ApiResponse({ status: 200, description: 'Successful operation' })
+  @ApiResponse({ status: 401, description: 'Unauthorized operation' })
+  @ApiResponse({ status: 400, description: 'Invalid status value' })
+  @ApiCookieAuth()
   async getUser(@Param('id', ParseIntPipe) id: number) {
     try {
       return await this.usersService.fetchUser(id);
@@ -58,7 +78,15 @@ export class UsersController {
   @Public()
   @Post()
   @ApiTags('users')
-  @ApiOperation({ description: 'Create a user' })
+  @ApiOperation({
+    summary: 'Add a new user',
+    description: 'Add a new user',
+    operationId: 'createUser',
+  })
+  @ApiResponse({ status: 200, description: 'Successful operation' })
+  @ApiResponse({ status: 401, description: 'Unauthorized operation' })
+  @ApiResponse({ status: 405, description: 'Invalid input' })
+  @ApiCookieAuth()
   @UsePipes(new JoiValidatorPipe(createUserSchema))
   async createUser(@Body() createUserDto: CreateUserDto) {
     try {
@@ -73,7 +101,15 @@ export class UsersController {
 
   @Patch(':id')
   @ApiTags('users')
-  @ApiOperation({ description: 'Update a user match an id' })
+  @ApiOperation({
+    summary: 'Updates a user with form data',
+    description: 'Updates a user with form data',
+    operationId: 'updateUser',
+  })
+  @ApiResponse({ status: 200, description: 'Successful operation' })
+  @ApiResponse({ status: 401, description: 'Unauthorized operation' })
+  @ApiResponse({ status: 405, description: 'Invalid input' })
+  @ApiCookieAuth()
   @UsePipes(new JoiValidatorPipe(updateUserSchema))
   async updateUser(
     @Param('id', ParseIntPipe) id: number,
@@ -91,7 +127,15 @@ export class UsersController {
 
   @Delete(':id')
   @ApiTags('users')
-  @ApiOperation({ description: 'Delete a user using an id' })
+  @ApiOperation({
+    summary: 'Deletes a user',
+    description: 'Delete a user',
+    operationId: 'deleteUser',
+  })
+  @ApiResponse({ status: 200, description: 'Successful operation' })
+  @ApiResponse({ status: 401, description: 'Unauthorized operation' })
+  @ApiResponse({ status: 400, description: 'Invalid user value' })
+  @ApiCookieAuth()
   async deleteUser(@Param('id', ParseIntPipe) id: number) {
     try {
       return await this.usersService.deleteuser(id);

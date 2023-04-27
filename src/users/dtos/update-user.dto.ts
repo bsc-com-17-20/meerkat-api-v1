@@ -11,7 +11,7 @@ export const updateUserSchema = Joi.object({
   abortEarly: false,
 });
 
-export interface UpdateUserDto {
+export class UpdateUserDto {
   username: string;
   email: string;
   password: string;

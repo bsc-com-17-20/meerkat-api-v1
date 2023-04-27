@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import * as Joi from 'joi';
 
 export const createBoardSchema = Joi.object({
@@ -7,7 +8,9 @@ export const createBoardSchema = Joi.object({
   abortEarly: false,
 });
 
-export interface EditPostDto {
+export class EditPostDto {
+  @ApiProperty({ example: 'Arch-Linux vs Ubuntu Linux' })
   title: string;
+  @ApiProperty({ example: 'Which one is the better linux distribution?' })
   content: string;
 }

@@ -12,7 +12,7 @@ export const createUserSchema = Joi.object({
   abortEarly: false,
 });
 
-export interface CreateUserDto {
+export class CreateUserDto {
   username: string;
   email: string;
   password: string;
