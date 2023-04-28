@@ -17,16 +17,17 @@ import { CreateBoardDto, EditBoardDto } from './dtos';
 import {
   ApiCookieAuth,
   ApiOperation,
-  ApiProperty,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { RolesAuthGuard } from '../auth/guards';
+import { Public } from '../auth/decorators';
 
 @Controller('boards')
 export class BoardsController {
   constructor(private boardsService: BoardsService) {}
 
+  @Public()
   @Get()
   @ApiTags('boards')
   @ApiOperation({
@@ -43,7 +44,6 @@ export class BoardsController {
     description: 'Unauthorized operation',
   })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
-  @ApiCookieAuth()
   async getBoards() {
     try {
       return await this.boardsService.fetchBoards();

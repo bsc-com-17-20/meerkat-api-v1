@@ -8,6 +8,12 @@ import { User } from '../users/models/users.entity';
 import { Repository } from 'typeorm';
 import { Post } from './models/posts.entity';
 
+// {
+//   "generatedMaps": [],
+//   "raw": [],
+//   "affected": 1
+// }
+
 describe('PostsService', () => {
   let service: PostsService;
   let replyRepository: Repository<Reply>;

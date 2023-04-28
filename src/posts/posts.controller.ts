@@ -11,6 +11,7 @@ import {
   Patch,
   Post,
   Req,
+  UsePipes,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto, EditPostDto } from './dtos';
@@ -21,6 +22,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards';
+import { JoiValidatorPipe } from 'src/utils/validation.pipe';
 
 @Controller('posts')
 export class PostsController {

@@ -112,7 +112,7 @@ export class UsersController {
   @ApiResponse({ status: 401, description: 'Unauthorized operation' })
   @ApiResponse({ status: 405, description: 'Invalid input' })
   @ApiCookieAuth()
-  @UsePipes(new JoiValidatorPipe(updateUserSchema))
+  // @UsePipes(new JoiValidatorPipe(updateUserSchema))
   async updateUser(
     @Body() updateUserDto: UpdateUserDto,
     @Param('id', ParseIntPipe) id: number,
