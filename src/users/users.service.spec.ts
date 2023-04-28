@@ -3,6 +3,47 @@ import { UsersService } from './users.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './models/users.entity';
 import { Repository } from 'typeorm';
+import { CreateUserDto } from './dtos';
+
+const userArray = [
+  {
+    id: expect.any(Number),
+    username: 'john',
+    email: 'john@email.com',
+    hash: expect.any(String),
+    imageURL: expect.any(String),
+    posts: [],
+    replies: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    role: 'user',
+  },
+  {
+    id: expect.any(Number),
+    username: 'ben',
+    email: 'ben@email.com',
+    hash: expect.any(String),
+    imageURL: expect.any(String),
+    posts: [],
+    replies: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    role: 'user',
+  },
+];
+
+const oneUser = {
+  id: expect.any(Number),
+  username: 'john',
+  email: 'john@email.com',
+  hash: expect.any(String),
+  imageURL: expect.any(String),
+  posts: [],
+  replies: [],
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  role: 'user',
+};
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -15,13 +56,19 @@ describe('UsersService', () => {
         UsersService,
         {
           provide: USER_REPOSITORY_TOKEN,
-          useClass: Repository,
+          useValue: {
+            find: jest.fn().mockResolvedValue(userArray),
+            findOneBy: jest.fn().mockResolvedValue(oneUser),
+            save: jest.fn().mockResolvedValue(oneUser),
+            remove: jest.fn(),
+            delete: jest.fn(),
+          },
         },
       ],
     }).compile();
 
     service = module.get<UsersService>(UsersService);
-    userRepository = module.get<Repository<User>>(USER_REPOSITORY_TOKEN);
+    userRepository = module.get(getRepositoryToken(User));
   });
 
   it('should be defined', () => {
@@ -34,26 +81,13 @@ describe('UsersService', () => {
 
   describe('createUser', () => {
     it('should create a new user an return it', async () => {
-      const expectedResponse: User = {
-        id: expect.any(Number),
+      const user: CreateUserDto = {
         username: 'john',
         email: 'john@email.com',
-        hash: '123',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        role: 'user',
+        password: '12345678',
       };
-      jest.spyOn(userRepository, 'create').mockReturnValue(expectedResponse);
-      jest.spyOn(userRepository, 'save').mockResolvedValue(expectedResponse);
 
-      const result = await service.createUser({
-        username: 'john',
-        email: 'john@email.com',
-        password: '123',
-      });
-      console.log(result);
-
-      expect(result).toEqual(expectedResponse);
+      expect(service.createUser(user)).resolves.toEqual(oneUser);
     });
   });
 

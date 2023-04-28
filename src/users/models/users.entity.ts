@@ -1,5 +1,5 @@
-import { Post } from 'src/posts/models/posts.entity';
-import { Reply } from 'src/replies/models/replies.entity';
+import { Post } from '../../posts/models/posts.entity';
+import { Reply } from '../../replies/models/replies.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()

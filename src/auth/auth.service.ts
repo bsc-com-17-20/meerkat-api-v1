@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
-import { CreateUserDto } from 'src/users/dtos';
+import { CreateUserDto } from '../users/dtos';
 
 @Injectable()
 export class AuthService {
@@ -31,6 +31,10 @@ export class AuthService {
   }
 
   async register(userDetails: CreateUserDto) {
-    this.usersService.createUser(userDetails);
+    return this.usersService.createUser(userDetails);
+  }
+
+  async profile(id: number) {
+    return this.usersService.fetchUser(id);
   }
 }

@@ -1,5 +1,5 @@
-import { Post } from 'src/posts/models/posts.entity';
-import { User } from 'src/users/models/users.entity';
+import { Post } from '../../posts/models/posts.entity';
+import { User } from '../../users/models/users.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()

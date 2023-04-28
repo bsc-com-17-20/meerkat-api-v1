@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { RepliesService } from './replies.service';
 import { CreateReplyDto, EditReplyDto, createReplySchema } from './dtos';
-import { JoiValidatorPipe } from 'src/utils/validation.pipe';
+import { JoiValidatorPipe } from '../utils/validation.pipe';
 import {
   ApiCookieAuth,
   ApiOperation,

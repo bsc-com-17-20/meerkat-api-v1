@@ -22,8 +22,8 @@ import {
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { Public } from './decorators';
-import { JoiValidatorPipe } from 'src/utils/validation.pipe';
-import { CreateUserDto, createUserSchema } from 'src/users/dtos';
+import { JoiValidatorPipe } from '../utils/validation.pipe';
+import { CreateUserDto, createUserSchema } from '../users/dtos';
 import { LoginUserDto } from './dtos';
 
 @Controller('auth')
@@ -94,6 +94,6 @@ export class AuthController {
   @ApiResponse({ status: 405, description: 'Invalid input' })
   @ApiCookieAuth()
   getProfile(@Request() req) {
-    return req.user;
+    return this.authService.profile(req.user.id);
   }
 }

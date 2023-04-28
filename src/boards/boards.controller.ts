@@ -21,7 +21,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { RolesAuthGuard } from 'src/auth/guards';
+import { RolesAuthGuard } from '../auth/guards';
 
 @Controller('boards')
 export class BoardsController {

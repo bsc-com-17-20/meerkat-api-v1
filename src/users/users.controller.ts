@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Req,
   UsePipes,
 } from '@nestjs/common';
 import {
@@ -24,8 +25,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Public } from 'src/auth/decorators';
-import { JoiValidatorPipe } from 'src/utils/validation.pipe';
+import { Public } from '../auth/decorators';
+import { JoiValidatorPipe } from '../utils/validation.pipe';
 
 @Controller('users')
 export class UsersController {
@@ -99,6 +100,7 @@ export class UsersController {
     }
   }
 
+  @Public()
   @Patch(':id')
   @ApiTags('users')
   @ApiOperation({
@@ -112,8 +114,8 @@ export class UsersController {
   @ApiCookieAuth()
   @UsePipes(new JoiValidatorPipe(updateUserSchema))
   async updateUser(
-    @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
+    @Param('id', ParseIntPipe) id: number,
   ) {
     try {
       return await this.usersService.updateUser(id, updateUserDto);

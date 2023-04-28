@@ -5,9 +5,9 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Board } from 'src/boards/model/boards.entity';
-import { User } from 'src/users/models/users.entity';
-import { Reply } from 'src/replies/models/replies.entity';
+import { Board } from '../../boards/model/boards.entity';
+import { User } from '../../users/models/users.entity';
+import { Reply } from '../../replies/models/replies.entity';
 
 @Entity()
 export class Post {

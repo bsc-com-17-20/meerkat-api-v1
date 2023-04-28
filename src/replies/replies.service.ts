@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Reply } from './models/replies.entity';
 import { Repository } from 'typeorm';
-import { Post } from 'src/posts/models/posts.entity';
-import { User } from 'src/users/models/users.entity';
+import { Post } from '../posts/models/posts.entity';
+import { User } from '../users/models/users.entity';
 import { CreateReplyDto, EditReplyDto } from './dtos';
 
 @Injectable()
