@@ -61,7 +61,7 @@ export class AuthController {
   }
 
   @Public()
-  @Post()
+  @Post('register')
   @ApiTags('auth')
   @ApiOperation({
     summary: 'Add a new user',

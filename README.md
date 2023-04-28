@@ -45,6 +45,12 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+## OpenAPI (Swagger) Documentation
+
+```
+localhost:3000/api
+```
+
 ## Test
 
 ```bash

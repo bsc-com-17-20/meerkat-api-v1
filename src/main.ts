@@ -27,7 +27,8 @@ async function bootstrap() {
         'constructive dialogue about current events, policies, and other relevant topics. It can ' +
         'also serve as a platform for organizing events, sharing resources, and building ' +
         'connections among students, faculty, and alumni. MeerKat contains sub-forums also ' +
-        'called communities or discussion boards.',
+        'called communities or discussion boards. ' +
+        'Note: Most routes are cookie auth protected start in the auth section and try out the login route to access all the others',
     )
     .setContact(
       'Benedict Zuze; bsc-com-17-20',
@@ -37,7 +38,7 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag(
       'auth',
-      'All about authentication and authorization, View a user profile',
+      'All about authentication and authorization, View a user profile. Use the login route first to access all routes',
     )
     .addTag('users', 'Everything about the user')
     .addTag(
