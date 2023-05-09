@@ -56,7 +56,7 @@ export class AuthController {
     this.logger.log(loginUserDto);
     const user = this.authService.login(req.user);
     const token = (await user).access_token;
-    res.cookie('token', `${token}`, { signed: true });
+    res.cookie('token', `${token}`, { signed: true, httpOnly: true });
     return this.authService.login(req.user);
   }
 

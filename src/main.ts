@@ -13,6 +13,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const cookieSecret = configService.get<string>('COOKIE_SECRET');
 
+  app.enableCors();
   app.use(helmet());
   app.use(cookieParser(cookieSecret));
   // serving images is for future use whenever there will be a need to incorporate image posting
@@ -50,7 +51,6 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-  app.enableCors();
   await app.listen(3000);
 }
 bootstrap();
