@@ -56,7 +56,7 @@ export class UsersService {
     }
   }
 
-  async createUser(userDetails: CreateUserDto) {
+  async createUser(userDetails: CreateUserDto): Promise<User> {
     try {
       const options = {
         url: `https://api.dicebear.com/6.x/thumbs/svg?seed=${userDetails.username}`,
