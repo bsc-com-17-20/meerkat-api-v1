@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './models/posts.entity';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { CreatePostDto, EditPostDto } from './dtos';
 import { Board } from '../boards/model/boards.entity';
 import { User } from '../users/models/users.entity';
@@ -70,7 +70,7 @@ export class PostsService {
     postDetails: EditPostDto,
     boardId: number,
     userId: number,
-  ) {
+  ): Promise<UpdateResult> {
     try {
       const ownership = await this.checkUserOwnership(id, userId);
       this.logger.log(ownership);
