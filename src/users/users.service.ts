@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './models/users.entity';
 import { Repository } from 'typeorm';
-import { CreateUserDto, UpdateUserDto } from './dtos';
+import { CreateUserDto, ResponseUserDto, UpdateUserDto } from './dtos';
 import * as bcrypt from 'bcrypt';
 import * as download from 'image-downloader';
 
@@ -13,10 +13,10 @@ export class UsersService {
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
-  async fetchUsers() {
+  async fetchUsers(): Promise<ResponseUserDto[]> {
     try {
       const users = await this.userRepository.find();
-      let retUsers = [];
+      let retUsers: ResponseUserDto[] = [];
       // removing the hash from the return users
       users.forEach((user) => {
         let { hash, ...result } = user;
@@ -74,10 +74,10 @@ export class UsersService {
       };
       this.logger.log({ ...user });
       const newUser = this.userRepository.create({ ...user });
-      await this.userRepository.save(newUser);
+      const savedUser = this.userRepository.save(newUser);
       const result = await download.image(options);
-      console.log(result.filename);
-      return newUser;
+      // console.log(result.filename);
+      return savedUser;
     } catch (error) {
       throw new Error(`Error creating user: ${error.message}`);
     }
