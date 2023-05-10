@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Reply } from './models/replies.entity';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { Post } from '../posts/models/posts.entity';
 import { User } from '../users/models/users.entity';
 import { CreateReplyDto, EditReplyDto } from './dtos';
@@ -34,7 +34,7 @@ export class RepliesService {
     replyDetails: CreateReplyDto,
     postId: number,
     userId: number,
-  ) {
+  ): Promise<Reply> {
     try {
       const user = await this.userRepository.findOneBy({ id: userId });
       const post = await this.postRepository.findOneBy({ id: postId });
@@ -55,7 +55,7 @@ export class RepliesService {
     replyId: number,
     postId: number,
     userId: number,
-  ) {
+  ): Promise<UpdateResult> {
     try {
       const ownership = await this.checkUserOwnership(replyId, userId);
       if (ownership) {
@@ -74,11 +74,11 @@ export class RepliesService {
     }
   }
 
-  async deleteReply(replyId: number, userId: number) {
+  async deleteReply(replyId: number, userId: number): Promise<DeleteResult> {
     try {
       const ownership = await this.checkUserOwnership(replyId, userId);
       if (ownership) {
-        return this.postRepository.delete({ id: replyId });
+        return this.replyRepository.delete({ id: replyId });
       }
       throw Error(`Error user does not own the reply user id ${userId}`);
     } catch (error) {

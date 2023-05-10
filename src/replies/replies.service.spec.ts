@@ -4,9 +4,39 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Board } from '../boards/model/boards.entity';
 import { Post } from '../posts/models/posts.entity';
 import { User } from '../users/models/users.entity';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { Reply } from './models/replies.entity';
 import { RepliesController } from './replies.controller';
+import { CreateReplyDto } from './dtos';
+
+const expectedPost: Post = {
+  id: expect.any(Number),
+  title: expect.any(String),
+  content: expect.any(String),
+  createdAt: expect.any(Date),
+  updatedAt: expect.any(Date),
+  edited: expect.any(Boolean),
+  board: expect.any(Board),
+  user: expect.any(User),
+  replies: [],
+};
+
+const expectedUser: User = {
+  id: 1,
+  role: expect.any(String),
+  username: expect.any(String),
+  hash: expect.any(String),
+  email: expect.any(String),
+  imageURL: expect.any(String),
+  createdAt: expect.any(Date),
+  updatedAt: expect.any(Date),
+  posts: [],
+  replies: [],
+};
+
+const replyDetails: CreateReplyDto = {
+  content: expect.any(String),
+};
 
 describe('RepliesService', () => {
   let service: RepliesService;
@@ -26,11 +56,19 @@ describe('RepliesService', () => {
         RepliesService,
         {
           provide: REPLY_REPOSITORY_TOKEN,
-          useValue: {},
+          useValue: {
+            find: jest.fn(),
+            create: jest.fn(),
+            save: jest.fn(),
+            update: jest.fn(),
+            delete: jest.fn(),
+          },
         },
         {
           provide: POST_REPOSITORY_TOKEN,
-          useValue: {},
+          useValue: {
+            findOneBy: jest.fn(),
+          },
         },
         {
           provide: BOARD_REPOSITORY_TOKEN,
@@ -38,7 +76,9 @@ describe('RepliesService', () => {
         },
         {
           provide: USER_REPOSITORY_TOKEN,
-          useValue: {},
+          useValue: {
+            findOneBy: jest.fn(),
+          },
         },
       ],
     }).compile();
@@ -52,5 +92,80 @@ describe('RepliesService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  describe('fetchAllReplies', () => {
+    it('should return an array of reply objects using post id', async () => {
+      const expectedResult: Reply[] = [];
+      const findSpy = jest
+        .spyOn(replyRepository, 'find')
+        .mockResolvedValue(expectedResult);
+      const result: Reply[] = await service.fetchAllReplies(1);
+      expect(findSpy).toBeCalledWith({ where: { post: { id: 1 } } });
+      expect(result).toEqual(expectedResult);
+    });
+
+    describe('createReply', () => {
+      it('should create a reply and return a reply object', async () => {
+        const expectedReply: Reply = {
+          id: expect.any(Number),
+          content: expect.any(String),
+          createdAt: expect.any(Date),
+          updateAt: expect.any(Date),
+          edited: false,
+          post: expect.any(Post),
+          user: expect.any(User),
+        };
+
+        const createSpy = jest
+          .spyOn(replyRepository, 'create')
+          .mockReturnValue(expectedReply);
+        const saveSpy = jest
+          .spyOn(replyRepository, 'save')
+          .mockResolvedValue(expectedReply);
+        const result: Reply = await service.createReply(replyDetails, 1, 1);
+        expect(createSpy).toBeCalled();
+        expect(saveSpy).toBeCalled();
+        expect(result).toEqual(expectedReply);
+      });
+    });
+
+    describe('updateReply', () => {
+      it('should update a reply and return an UpdateResult object', async () => {
+        const expectedResult: UpdateResult = {
+          raw: [],
+          generatedMaps: [],
+          affected: 1,
+        };
+        jest.spyOn(service, 'checkUserOwnership').mockResolvedValue(true);
+        const updateSpy = jest
+          .spyOn(replyRepository, 'update')
+          .mockResolvedValue(expectedResult);
+        const result: UpdateResult = await service.updateReply(
+          replyDetails,
+          1,
+          1,
+          1,
+        );
+        expect(updateSpy).toBeCalled();
+        expect(result).toEqual(expectedResult);
+      });
+    });
+  });
+
+  describe('deleteReply', () => {
+    it('should delete a reply and return a DeleteResult object', async () => {
+      const expectedResult: DeleteResult = {
+        raw: [],
+        affected: 1,
+      };
+      jest.spyOn(service, 'checkUserOwnership').mockResolvedValue(true);
+      const deleteSpy = jest
+        .spyOn(replyRepository, 'delete')
+        .mockResolvedValue(expectedResult);
+      const result: DeleteResult = await service.deleteReply(1, 1);
+      expect(deleteSpy).toBeCalled();
+      expect(result).toEqual(expectedResult);
+    });
   });
 });
