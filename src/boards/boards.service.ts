@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Board } from './model/boards.entity';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { CreateBoardDto, EditBoardDto } from './dtos';
 
 @Injectable()
@@ -10,26 +10,28 @@ export class BoardsService {
     @InjectRepository(Board) private boardRepository: Repository<Board>,
   ) {}
 
-  async fetchBoards() {
+  async fetchBoards(): Promise<Board[]> {
     try {
-      const boards = await this.boardRepository.find();
+      const boards = this.boardRepository.find();
       return boards;
     } catch (error) {
       throw new Error(`Error retrieving users: ${error.message}`);
     }
   }
 
-  async createBoard(boardDetails: CreateBoardDto) {
+  async createBoard(boardDetails: CreateBoardDto): Promise<Board> {
     try {
       const newBoard = this.boardRepository.create({ ...boardDetails });
-      await this.boardRepository.save(newBoard);
-      return newBoard;
+      return this.boardRepository.save(newBoard);
     } catch (error) {
       throw new Error(`Error creating a board: ${error.message}`);
     }
   }
 
-  async updateBoard(id: number, boardDetails: EditBoardDto) {
+  async updateBoard(
+    id: number,
+    boardDetails: EditBoardDto,
+  ): Promise<UpdateResult> {
     try {
       return this.boardRepository.update({ id }, { ...boardDetails });
     } catch (error) {
@@ -37,7 +39,7 @@ export class BoardsService {
     }
   }
 
-  async deleteBoard(id: number) {
+  async deleteBoard(id: number): Promise<DeleteResult> {
     try {
       return this.boardRepository.delete({ id });
     } catch (error) {

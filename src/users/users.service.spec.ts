@@ -4,6 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './models/users.entity';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { CreateUserDto, ResponseUserDto, UpdateUserDto } from './dtos';
+import * as download from 'image-downloader';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -68,6 +69,11 @@ describe('UsersService', () => {
         role: 'user',
       };
 
+      const downloadResult: download.DownloadResult = {
+        filename: expect.any(String),
+      };
+
+      jest.spyOn(download, 'image').mockResolvedValue(downloadResult);
       const createSpy = jest
         .spyOn(userRepository, 'create')
         .mockReturnValue(expectedSpyResult);
