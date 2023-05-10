@@ -2,41 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './models/users.entity';
-import { Repository } from 'typeorm';
-import { CreateUserDto, ResponseUserDto } from './dtos';
-
-const userArray = [
-  {
-    id: expect.any(Number),
-    username: 'john',
-    email: 'john@email.com',
-    hash: expect.any(String),
-    imageURL: expect.any(String),
-    posts: [],
-    replies: [],
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    role: 'user',
-  },
-  {
-    id: expect.any(Number),
-    username: 'ben',
-    email: 'ben@email.com',
-    hash: expect.any(String),
-    imageURL: expect.any(String),
-    posts: [],
-    replies: [],
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    role: 'user',
-  },
-];
-
-// find: jest.fn().mockResolvedValue(userArray),
-//             findOneBy: jest.fn().mockResolvedValue(oneUser),
-//             save: jest.fn().mockResolvedValue(oneUser),
-//             remove: jest.fn(),
-//             delete: jest.fn(),
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { CreateUserDto, ResponseUserDto, UpdateUserDto } from './dtos';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -51,8 +18,11 @@ describe('UsersService', () => {
           provide: USER_REPOSITORY_TOKEN,
           useValue: {
             find: jest.fn(),
+            findOneBy: jest.fn(),
             create: jest.fn(),
             save: jest.fn(),
+            update: jest.fn(),
+            delete: jest.fn(),
           },
         },
       ],
@@ -71,7 +41,7 @@ describe('UsersService', () => {
   });
 
   describe('createUser', () => {
-    it('should create a new user an return it', async () => {
+    it('should create a new user and return a user object ', async () => {
       const user: CreateUserDto = {
         username: 'john',
         email: 'john@email.com',
@@ -112,11 +82,140 @@ describe('UsersService', () => {
   });
 
   describe('fetchUsers', () => {
-    it('should return an array of users', async () => {
+    it('should return an array of user objetcs', async () => {
       const expectedSpyResult: ResponseUserDto[] = [];
       const expectedResponse: User[] = [];
-      jest.spyOn(userRepository, 'find').mockResolvedValue(expectedResponse);
+      const findSpy = jest
+        .spyOn(userRepository, 'find')
+        .mockResolvedValue(expectedResponse);
       const result = await service.fetchUsers();
+      expect(findSpy).toBeCalledTimes(1);
+      expect(result).toEqual(expectedSpyResult);
+    });
+  });
+
+  describe('fetchUser', () => {
+    it('should return a user object using an id', async () => {
+      const expectedSpyResult: ResponseUserDto = {
+        id: 1,
+        role: expect.any(String),
+        username: expect.any(String),
+        email: expect.any(String),
+        imageURL: expect.any(String),
+        createdAt: expect.any(Date),
+        updatedAt: expect.any(Date),
+        posts: [],
+        replies: [],
+      };
+      const expectedFindSpyResult: User = {
+        id: 1,
+        role: expect.any(String),
+        username: expect.any(String),
+        email: expect.any(String),
+        hash: expect.any(String),
+        imageURL: expect.any(String),
+        createdAt: expect.any(Date),
+        updatedAt: expect.any(Date),
+        posts: [],
+        replies: [],
+      };
+      const findOneBySpy = jest
+        .spyOn(userRepository, 'findOneBy')
+        .mockResolvedValue(expectedFindSpyResult);
+      const result = await service.fetchUser(1);
+      expect(findOneBySpy).toBeCalledWith({ id: 1 });
+      expect(result).toEqual(expectedSpyResult);
+    });
+  });
+
+  describe('findOne', () => {
+    it('should return a user object using a username', async () => {
+      const expectedSpyResult: User = {
+        id: expect.any(Number),
+        role: expect.any(String),
+        username: 'john',
+        hash: expect.any(String),
+        email: expect.any(String),
+        imageURL: expect.any(String),
+        createdAt: expect.any(Date),
+        updatedAt: expect.any(Date),
+        posts: [],
+        replies: [],
+      };
+      const findOneBySpy = jest
+        .spyOn(userRepository, 'findOneBy')
+        .mockResolvedValue(expectedSpyResult);
+      const result = await service.findOne('john');
+      expect(findOneBySpy).toBeCalledWith({ username: 'john' });
+      expect(result).toEqual(expectedSpyResult);
+    });
+  });
+
+  describe('updateUser', () => {
+    it('should update a user object and return a UpdateResult object', async () => {
+      const updateContent: UpdateUserDto = {
+        username: 'john',
+        email: 'john@email.com',
+        password: '12345',
+      };
+      const expectedFetchUserSpyResult: ResponseUserDto = {
+        id: 1,
+        role: expect.any(String),
+        username: expect.any(String),
+        email: expect.any(String),
+        imageURL: expect.any(String),
+        createdAt: expect.any(Date),
+        updatedAt: expect.any(Date),
+        posts: [],
+        replies: [],
+      };
+      const expectedSpyResult: UpdateResult = {
+        raw: [],
+        generatedMaps: [],
+        affected: 1,
+      };
+      const fetchUserSpy = jest
+        .spyOn(service, 'fetchUser')
+        .mockResolvedValue(expectedFetchUserSpyResult);
+      const updateSpy = jest
+        .spyOn(userRepository, 'update')
+        .mockResolvedValue(expectedSpyResult);
+      const result = await service.updateUser(1, updateContent);
+      expect(fetchUserSpy).toBeCalledWith(1);
+      expect(updateSpy).toBeCalledWith(
+        { id: 1 },
+        { ...updateContent, updatedAt: expect.any(Date) },
+      );
+      expect(result).toEqual(expectedSpyResult);
+    });
+  });
+
+  describe('deleteUser', () => {
+    it('should delete a user object and return a DeleteResult object', async () => {
+      const expectedFetchUserSpyResult: ResponseUserDto = {
+        id: 1,
+        role: expect.any(String),
+        username: expect.any(String),
+        email: expect.any(String),
+        imageURL: expect.any(String),
+        createdAt: expect.any(Date),
+        updatedAt: expect.any(Date),
+        posts: [],
+        replies: [],
+      };
+      const expectedSpyResult: DeleteResult = {
+        raw: [],
+        affected: 1,
+      };
+      const fetchUserSpy = jest
+        .spyOn(service, 'fetchUser')
+        .mockResolvedValue(expectedFetchUserSpyResult);
+      const deleteSpy = jest
+        .spyOn(userRepository, 'delete')
+        .mockResolvedValue(expectedSpyResult);
+      const result = await service.deleteuser(1);
+      expect(fetchUserSpy).toBeCalledWith(1);
+      expect(deleteSpy).toBeCalledWith({ id: 1 });
       expect(result).toEqual(expectedSpyResult);
     });
   });

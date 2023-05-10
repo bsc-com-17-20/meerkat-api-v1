@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './models/users.entity';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { CreateUserDto, ResponseUserDto, UpdateUserDto } from './dtos';
 import * as bcrypt from 'bcrypt';
 import * as download from 'image-downloader';
@@ -28,7 +28,7 @@ export class UsersService {
     }
   }
 
-  async fetchUser(id: number) {
+  async fetchUser(id: number): Promise<ResponseUserDto> {
     try {
       const { hash, ...user } = await this.userRepository.findOneBy({ id });
       if (!user) {
@@ -40,7 +40,7 @@ export class UsersService {
     }
   }
 
-  async findOne(username: string) {
+  async findOne(username: string): Promise<User> {
     try {
       this.logger.log(username);
       const user = await this.userRepository.findOneBy({ username });
@@ -83,7 +83,10 @@ export class UsersService {
     }
   }
 
-  async updateUser(id: number, updateUserDetails: UpdateUserDto) {
+  async updateUser(
+    id: number,
+    updateUserDetails: UpdateUserDto,
+  ): Promise<UpdateResult> {
     try {
       await this.fetchUser(id);
       return this.userRepository.update(
@@ -95,7 +98,7 @@ export class UsersService {
     }
   }
 
-  async deleteuser(id: number) {
+  async deleteuser(id: number): Promise<DeleteResult> {
     try {
       await this.fetchUser(id);
       return this.userRepository.delete({ id });
