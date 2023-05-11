@@ -56,6 +56,34 @@ export class PostsController {
     }
   }
 
+  @Get(':boardId/:postId')
+  @ApiTags('posts')
+  @ApiOperation({
+    summary: 'List all posts under a board',
+    description: 'Gets all posts using a board id',
+    operationId: 'fetchPostsByBoardId',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Successful operation',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized operation',
+  })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
+  @ApiCookieAuth()
+  async getPostById(@Param('id', ParseIntPipe) id: number) {
+    try {
+      return await this.postsService.fetchPostByPostId(id);
+    } catch (error) {
+      throw new NotFoundException('Something went wrong', {
+        cause: error,
+        description: `${error.message}`,
+      });
+    }
+  }
+
   @Post(':id')
   @ApiTags('posts')
   @ApiOperation({

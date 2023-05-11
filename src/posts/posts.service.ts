@@ -45,6 +45,18 @@ export class PostsService {
     }
   }
 
+  async fetchPostByPostId(postId: number): Promise<Post[]> {
+    try {
+      return this.postRepository.find({
+        where: {
+          id: postId,
+        },
+      });
+    } catch (error) {
+      throw new Error(`Error retrieving users: ${error.message}`);
+    }
+  }
+
   async createPost(
     postDetails: CreatePostDto,
     boardId: number,

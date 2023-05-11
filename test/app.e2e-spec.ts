@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
 import * as cookieParser from 'cookie-parser';
 import { LoginUserDto } from '../src/auth/dtos';
 import { CreateUserDto } from '../src/users/dtos';
@@ -119,7 +118,7 @@ describe('App (e2e)', () => {
     });
   });
 
-  describe('POST /posts/:id and DELETE /posts/:boardId/:postId', () => {
+  describe('POST /posts/:id and DELETE /posts/:postId', () => {
     it('should return 201 if user is authenticated', async () => {
       const agent = request.agent(app.getHttpServer());
       await agent.post('/auth/login').send(account).expect(201);
@@ -128,6 +127,20 @@ describe('App (e2e)', () => {
         .send(createPost)
         .expect(201);
       const { id } = response.body;
+      await agent.delete(`/posts/${id}`).expect(200);
+    });
+  });
+
+  describe('PATCH /posts/:boardId/:postId and DELETE /posts/:postId', () => {
+    it('should return 201 if user is authenticated', async () => {
+      const agent = request.agent(app.getHttpServer());
+      await agent.post('/auth/login').send(account).expect(201);
+      const response = await agent
+        .post(`/posts/1`)
+        .send(createPost)
+        .expect(201);
+      const { id } = response.body;
+      await agent.patch(`/posts/1/${id}`).send(createPost).expect(200);
       await agent.delete(`/posts/${id}`).expect(200);
     });
   });
