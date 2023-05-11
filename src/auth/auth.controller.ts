@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpStatus,
   InternalServerErrorException,
   Logger,
   Post,
@@ -68,9 +69,10 @@ export class AuthController {
     description: 'Add a new user',
     operationId: 'createUser',
   })
-  @ApiResponse({ status: 200, description: 'Successful operation' })
+  @ApiResponse({ status: 201, description: 'Successful operation' })
   @ApiResponse({ status: 401, description: 'Unauthorized operation' })
   @ApiResponse({ status: 405, description: 'Invalid input' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
   @UsePipes(new JoiValidatorPipe(createUserSchema))
   async register(@Body() createUserDto: CreateUserDto) {
     try {

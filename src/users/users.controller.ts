@@ -54,7 +54,29 @@ export class UsersController {
     }
   }
 
-  @Get(':id')
+  // @Get(':id')
+  // @ApiTags('users')
+  // @ApiOperation({
+  //   summary: 'Find user by ID',
+  //   description: 'Returns a single user',
+  //   operationId: 'fetchUser',
+  // })
+  // @ApiResponse({ status: 200, description: 'Successful operation' })
+  // @ApiResponse({ status: 401, description: 'Unauthorized operation' })
+  // @ApiResponse({ status: 400, description: 'Invalid status value' })
+  // @ApiCookieAuth()
+  // async getUser(@Param('id', ParseIntPipe) id: number) {
+  //   try {
+  //     return await this.usersService.fetchUser(id);
+  //   } catch (error) {
+  //     throw new NotFoundException(`Something went wrong`, {
+  //       cause: error,
+  //       description: `${error.message}`,
+  //     });
+  //   }
+  // }
+
+  @Get(':user')
   @ApiTags('users')
   @ApiOperation({
     summary: 'Find user by ID',
@@ -65,9 +87,10 @@ export class UsersController {
   @ApiResponse({ status: 401, description: 'Unauthorized operation' })
   @ApiResponse({ status: 400, description: 'Invalid status value' })
   @ApiCookieAuth()
-  async getUser(@Param('id', ParseIntPipe) id: number) {
+  async getUserByUsername(@Param('user') username: string) {
     try {
-      return await this.usersService.fetchUser(id);
+      const { hash, ...result } = await this.usersService.findOne(username);
+      return result;
     } catch (error) {
       throw new NotFoundException(`Something went wrong`, {
         cause: error,
