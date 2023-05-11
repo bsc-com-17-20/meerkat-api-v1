@@ -5,11 +5,19 @@ import { AppModule } from './../src/app.module';
 import * as cookieParser from 'cookie-parser';
 import { LoginUserDto } from '../src/auth/dtos';
 import { CreateUserDto } from '../src/users/dtos';
+import { CreatePostDto } from '../src/posts/dtos';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Board } from '../src/boards/model/boards.entity';
 import { Reply } from '../src/replies/models/replies.entity';
 import { User } from '../src/users/models/users.entity';
 import { Post } from '../src/posts/models/posts.entity';
+import { AuthModule } from '../src/auth/auth.module';
+import { BoardsModule } from '../src/boards/boards.module';
+import { PostsModule } from '../src/posts/posts.module';
+import { RepliesModule } from '../src/replies/replies.module';
+import { UsersModule } from '../src/users/users.module';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from '../src/auth/guards';
 
 const account: LoginUserDto = {
   username: 'dennis23',
@@ -22,24 +30,36 @@ const createAccount: CreateUserDto = {
   password: '1234545678',
 };
 
+const createPost: CreatePostDto = {
+  title: 'Some title',
+  content: 'Some random content',
+};
+
 describe('App (e2e)', () => {
   let app: INestApplication;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
-        AppModule,
-        TypeOrmModule.forRoot({
-          type: 'mysql',
-          host: 'localhost',
-          port: 3306,
-          username: process.env.DATABASE_USER,
-          password: process.env.DATABASE_PASSWORD,
-          database: 'meerkat_v1_test',
-          entities: [User, Board, Post, Reply],
-          synchronize: true,
+        TypeOrmModule.forRootAsync({
+          useFactory: () => ({
+            type: 'mysql',
+            host: 'localhost',
+            port: 3306,
+            username: 'root',
+            password: '',
+            database: 'meerkat_v1_test',
+            entities: [User, Board, Post, Reply],
+            synchronize: true,
+          }),
         }),
+        UsersModule,
+        BoardsModule,
+        PostsModule,
+        AuthModule,
+        RepliesModule,
       ],
+      providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -53,7 +73,7 @@ describe('App (e2e)', () => {
         .post('/auth/register')
         .send(createAccount)
         .expect(201);
-    });
+    }, 30000);
   });
 
   describe('POST /auth/login', () => {
@@ -77,9 +97,38 @@ describe('App (e2e)', () => {
     });
   });
 
+  describe('GET /users/:username', () => {
+    it('should return 200 if user is authenticated', async () => {
+      const agent = request.agent(app.getHttpServer());
+      await agent.post('/auth/login').send(account).expect(201);
+      await agent.get(`/users/${account.username}`).expect(200);
+    });
+  });
+
   describe('GET /boards', () => {
     it('/boards (GET)', async () => {
       await request(app.getHttpServer()).get('/boards').expect(200);
+    });
+  });
+
+  describe('GET /posts/:id', () => {
+    it('should return 200 if user is authenticated', async () => {
+      const agent = request.agent(app.getHttpServer());
+      await agent.post('/auth/login').send(account).expect(201);
+      await agent.get(`/posts/1`).expect(200);
+    });
+  });
+
+  describe('POST /posts/:id and DELETE /posts/:boardId/:postId', () => {
+    it('should return 201 if user is authenticated', async () => {
+      const agent = request.agent(app.getHttpServer());
+      await agent.post('/auth/login').send(account).expect(201);
+      const response = await agent
+        .post(`/posts/1`)
+        .send(createPost)
+        .expect(201);
+      const { id } = response.body;
+      await agent.delete(`/posts/${id}`).expect(200);
     });
   });
 
@@ -92,6 +141,7 @@ describe('App (e2e)', () => {
       await agent.delete(`/users/${id}`).expect(200);
     });
   });
+
   afterAll(async () => {
     await app.close();
   });

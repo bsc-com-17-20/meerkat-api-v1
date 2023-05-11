@@ -36,7 +36,7 @@ export class PostsController {
     operationId: 'fetchPostsByBoardId',
   })
   @ApiResponse({
-    status: HttpStatus.FOUND,
+    status: HttpStatus.OK,
     description: 'Successful operation',
   })
   @ApiResponse({
