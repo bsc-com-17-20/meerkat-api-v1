@@ -23,20 +23,20 @@ import {
 import { RolesAuthGuard } from '../auth/guards';
 import { Public } from '../auth/decorators';
 
+@ApiTags('boards')
 @Controller('boards')
 export class BoardsController {
   constructor(private boardsService: BoardsService) {}
 
   @Public()
   @Get()
-  @ApiTags('boards')
   @ApiOperation({
     summary: 'List all boards',
     description: 'Returns an array containing all the boards in the database',
     operationId: 'fetchBoards',
   })
   @ApiResponse({
-    status: HttpStatus.FOUND,
+    status: HttpStatus.OK,
     description: 'Successful operation',
   })
   @ApiResponse({
@@ -56,7 +56,6 @@ export class BoardsController {
   }
 
   @Post()
-  @ApiTags('boards')
   @ApiOperation({
     summary: 'Admin: Create a new board',
     description: 'Creates a new board',
@@ -85,7 +84,6 @@ export class BoardsController {
   }
 
   @Patch(':id')
-  @ApiTags('boards')
   @ApiOperation({
     summary: 'Admin: Edit a board using form data',
     description: 'Edits a board using form data',
@@ -117,7 +115,6 @@ export class BoardsController {
   }
 
   @Delete(':id')
-  @ApiTags('boards')
   @ApiOperation({
     summary: 'Admin: Deletes a board',
     description: 'Deletes a board',

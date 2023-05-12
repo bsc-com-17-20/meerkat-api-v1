@@ -27,6 +27,7 @@ import { JoiValidatorPipe } from '../utils/validation.pipe';
 import { CreateUserDto, createUserSchema } from '../users/dtos';
 import { LoginUserDto } from './dtos';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
@@ -35,7 +36,6 @@ export class AuthController {
   @Public()
   @Post('login')
   @UseGuards(LocalAuthGuard)
-  @ApiTags('auth')
   @ApiOperation({
     summary: 'Logs in and return the authentication cookie',
     description: 'Authenticates a user by providing a JWT access token',
@@ -47,7 +47,6 @@ export class AuthController {
       'Successfully authenticated ' + 'The JWT is returned in a cookie',
   })
   @ApiResponse({ status: 405, description: 'Invalid input' })
-  @ApiSecurity({})
   async login(
     @Body() loginUserDto: LoginUserDto,
     @Request() req,
@@ -63,7 +62,6 @@ export class AuthController {
 
   @Public()
   @Post('register')
-  @ApiTags('auth')
   @ApiOperation({
     summary: 'Add a new user',
     description: 'Add a new user',
@@ -86,7 +84,6 @@ export class AuthController {
   }
 
   @Get('profile')
-  @ApiTags('auth')
   @ApiOperation({
     summary: "View a user's profile",
     description: "Returns a user's details",
@@ -96,6 +93,7 @@ export class AuthController {
   @ApiResponse({ status: 405, description: 'Invalid input' })
   @ApiCookieAuth()
   getProfile(@Request() req) {
+    this.logger.log(req.user.id);
     return this.authService.profile(req.user.id);
   }
 }

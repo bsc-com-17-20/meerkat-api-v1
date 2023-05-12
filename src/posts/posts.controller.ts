@@ -21,15 +21,14 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards';
 import { JoiValidatorPipe } from 'src/utils/validation.pipe';
 
+@ApiTags('posts')
 @Controller('posts')
 export class PostsController {
   constructor(private postsService: PostsService) {}
 
   @Get(':id')
-  @ApiTags('posts')
   @ApiOperation({
     summary: 'List all posts under a board',
     description: 'Gets all posts using a board id',
@@ -57,7 +56,6 @@ export class PostsController {
   }
 
   @Get(':boardId/:postId')
-  @ApiTags('posts')
   @ApiOperation({
     summary: 'List all posts under a board',
     description: 'Gets all posts using a board id',
@@ -85,7 +83,6 @@ export class PostsController {
   }
 
   @Post(':id')
-  @ApiTags('posts')
   @ApiOperation({
     summary: 'Creates a posts on a board',
     description: 'Creates a post using on a board using a board ID',
@@ -118,7 +115,6 @@ export class PostsController {
   }
 
   @Patch(':boardId/:postId')
-  @ApiTags('posts')
   @ApiOperation({
     summary: 'Updates a post',
     description: 'Updates a post using the board ID and post ID',
@@ -157,7 +153,6 @@ export class PostsController {
   }
 
   @Delete(':id')
-  @ApiTags('posts')
   @ApiOperation({
     summary: 'Delete a post',
     description: 'Deletes a post using the post ID and user ID',

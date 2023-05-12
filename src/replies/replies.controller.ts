@@ -22,12 +22,12 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+@ApiTags('replies')
 @Controller('replies')
 export class RepliesController {
   constructor(private readonly repliesService: RepliesService) {}
 
   @Get(':id')
-  @ApiTags('replies')
   @ApiOperation({
     summary: 'List all replies under a post',
     description: 'Gets all replies using a user ID',
@@ -48,7 +48,6 @@ export class RepliesController {
   }
 
   @Post(':id')
-  @ApiTags('replies')
   @ApiOperation({
     summary: 'Add a new reply',
     description: 'Create a new reply to a post',
@@ -82,7 +81,6 @@ export class RepliesController {
   }
 
   @Patch(':postId/:replyId')
-  @ApiTags('replies')
   @ApiOperation({
     summary: 'Updates a reply with form data',
     description: 'Updates a reply under a post (post ID)',
@@ -122,7 +120,6 @@ export class RepliesController {
   }
 
   @Delete(':id')
-  @ApiTags('replies')
   @ApiOperation({
     summary: 'Delete a reply',
     description: 'Deletes a reply using the replyID and userID',
