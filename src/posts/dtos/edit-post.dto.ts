@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import * as Joi from 'joi';
 
-export const createBoardSchema = Joi.object({
+export const editPostSchema = Joi.object({
   title: Joi.string().alphanum().min(3).max(50).optional(),
   content: Joi.string().optional(),
 }).options({

@@ -5,6 +5,7 @@ import {
   Get,
   HttpStatus,
   InternalServerErrorException,
+  Logger,
   Param,
   ParseIntPipe,
   Patch,
@@ -13,7 +14,12 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { RepliesService } from './replies.service';
-import { CreateReplyDto, EditReplyDto, createReplySchema } from './dtos';
+import {
+  CreateReplyDto,
+  EditReplyDto,
+  createReplySchema,
+  editReplySchema,
+} from './dtos';
 import { JoiValidatorPipe } from '../utils/validation.pipe';
 import {
   ApiCookieAuth,
@@ -25,6 +31,7 @@ import {
 @ApiTags('replies')
 @Controller('replies')
 export class RepliesController {
+  logger = new Logger(RepliesController.name);
   constructor(private readonly repliesService: RepliesService) {}
 
   @Get(':id')
@@ -48,7 +55,7 @@ export class RepliesController {
   }
 
   @Post(':id')
-  // @UsePipes(new JoiValidatorPipe(createReplySchema))
+  @UsePipes(new JoiValidatorPipe(createReplySchema))
   @ApiOperation({
     summary: 'Add a new reply',
     description: 'Create a new reply to a post',
@@ -64,12 +71,15 @@ export class RepliesController {
   })
   @ApiResponse({ status: 405, description: 'Invalid input' })
   @ApiCookieAuth()
+  // Do not use @Params() it is confilcting with the JoiValidator and messing up the validation use
+  // manual req.params instead
   async createReply(
-    @Param('id', ParseIntPipe) id: number,
+    // @Param('id', ParseIntPipe) id: number,
     @Body() createReplyDto: CreateReplyDto,
     @Req() req,
   ) {
     try {
+      const { id } = req.params;
       const userId = req.user.id;
       const response = await this.repliesService.createReply(
         createReplyDto,
@@ -106,14 +116,17 @@ export class RepliesController {
   })
   @ApiResponse({ status: 405, description: 'Invalid input' })
   @ApiCookieAuth()
-  @UsePipes(new JoiValidatorPipe(createReplySchema))
+  @UsePipes(new JoiValidatorPipe(editReplySchema))
+  // Do not use @Params() it is confilcting with the JoiValidator and messing up the validation use
+  // manual req.params instead
   async updateReply(
-    @Param('postId', ParseIntPipe) postId: number,
-    @Param('replyId', ParseIntPipe) replyId: number,
+    // @Param('postId', ParseIntPipe) postId: number,
+    // @Param('replyId', ParseIntPipe) replyId: number,
     @Body() editReplyDto: EditReplyDto,
     @Req() req,
   ) {
     try {
+      const { postId, replyId } = req.params;
       const userId = req.user.id;
       return await this.repliesService.updateReply(
         editReplyDto,

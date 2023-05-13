@@ -14,14 +14,19 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { CreatePostDto, EditPostDto } from './dtos';
+import {
+  CreatePostDto,
+  EditPostDto,
+  createPostSchema,
+  editPostSchema,
+} from './dtos';
 import {
   ApiCookieAuth,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { JoiValidatorPipe } from 'src/utils/validation.pipe';
+import { JoiValidatorPipe } from '../utils/validation.pipe';
 
 @ApiTags('posts')
 @Controller('posts')
@@ -98,12 +103,16 @@ export class PostsController {
   })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
   @ApiCookieAuth()
+  @UsePipes(new JoiValidatorPipe(createPostSchema))
+  // Do not use @Params() it is confilcting with the JoiValidator and messing up the validation use
+  // manual req.params instead
   async creatPost(
-    @Param('id', ParseIntPipe) id: number,
+    // @Param('id', ParseIntPipe) id: number,
     @Body() createPostDto: CreatePostDto,
     @Req() req,
   ) {
     try {
+      const { id } = req.params;
       const userId = req.user.id;
       return await this.postsService.createPost(createPostDto, id, userId);
     } catch (error) {
@@ -130,13 +139,17 @@ export class PostsController {
   })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
   @ApiCookieAuth()
+  @UsePipes(new JoiValidatorPipe(editPostSchema))
+  // Do not use @Params() it is confilcting with the JoiValidator and messing up the validation use
+  // manual req.params instead
   async updatePost(
-    @Param('boardId', ParseIntPipe) boardId: number,
-    @Param('postId', ParseIntPipe) postId: number,
+    // @Param('boardId', ParseIntPipe) boardId: number,
+    // @Param('postId', ParseIntPipe) postId: number,
     @Body() editPostDto: EditPostDto,
     @Req() req,
   ) {
     try {
+      const { boardId, postId } = req.params;
       const userId = req.user.id;
       return await this.postsService.updatePost(
         postId,

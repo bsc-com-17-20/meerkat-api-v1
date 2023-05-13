@@ -10,10 +10,17 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Req,
   UseGuards,
+  UsePipes,
 } from '@nestjs/common';
 import { BoardsService } from './boards.service';
-import { CreateBoardDto, EditBoardDto } from './dtos';
+import {
+  CreateBoardDto,
+  EditBoardDto,
+  createBoardSchema,
+  editBoardSchema,
+} from './dtos';
 import {
   ApiCookieAuth,
   ApiOperation,
@@ -22,6 +29,7 @@ import {
 } from '@nestjs/swagger';
 import { RolesAuthGuard } from '../auth/guards';
 import { Public } from '../auth/decorators';
+import { JoiValidatorPipe } from '../utils/validation.pipe';
 
 @ApiTags('boards')
 @Controller('boards')
@@ -72,6 +80,7 @@ export class BoardsController {
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
   @ApiCookieAuth()
   @UseGuards(new RolesAuthGuard('admin'))
+  @UsePipes(new JoiValidatorPipe(createBoardSchema))
   async createBoard(@Body() createBoardDto: CreateBoardDto) {
     try {
       return await this.boardsService.createBoard(createBoardDto);
@@ -100,11 +109,16 @@ export class BoardsController {
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
   @ApiCookieAuth()
   @UseGuards(new RolesAuthGuard('admin'))
+  @UsePipes(new JoiValidatorPipe(editBoardSchema))
+  // Do not use @Params() it is confilcting with the JoiValidator and messing up the validation use
+  // manual req.params instead
   async updateBoard(
-    @Param('id', ParseIntPipe) id: number,
+    // @Param('id', ParseIntPipe) id: number,
+    @Req() req,
     @Body() editBoardDto: EditBoardDto,
   ) {
     try {
+      const { id } = req.params;
       return await this.boardsService.updateBoard(id, editBoardDto);
     } catch (error) {
       throw new InternalServerErrorException('Something went wrong', {

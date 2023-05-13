@@ -25,7 +25,7 @@ import { Response } from 'express';
 import { Public } from './decorators';
 import { JoiValidatorPipe } from '../utils/validation.pipe';
 import { CreateUserDto, createUserSchema } from '../users/dtos';
-import { LoginUserDto } from './dtos';
+import { LoginUserDto, loginUserSchema } from './dtos';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -47,6 +47,7 @@ export class AuthController {
       'Successfully authenticated ' + 'The JWT is returned in a cookie',
   })
   @ApiResponse({ status: 405, description: 'Invalid input' })
+  @UsePipes(new JoiValidatorPipe(loginUserSchema))
   async login(
     @Body() loginUserDto: LoginUserDto,
     @Request() req,

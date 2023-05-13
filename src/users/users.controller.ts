@@ -100,7 +100,7 @@ export class UsersController {
     }
   }
 
-  @UseGuards(new RolesAuthGuard('admin'))
+  // @UseGuards(new RolesAuthGuard('admin'))
   @Post()
   @ApiOperation({
     summary: 'Admin: Add a new user',
