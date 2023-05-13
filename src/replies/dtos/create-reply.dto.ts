@@ -1,7 +1,7 @@
 import * as Joi from 'joi';
 
 export const createReplySchema = Joi.object({
-  content: Joi.string().alphanum().required(),
+  content: Joi.string(),
 }).options({
   abortEarly: false,
 });

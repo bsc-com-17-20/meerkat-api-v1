@@ -48,6 +48,7 @@ export class RepliesController {
   }
 
   @Post(':id')
+  // @UsePipes(new JoiValidatorPipe(createReplySchema))
   @ApiOperation({
     summary: 'Add a new reply',
     description: 'Create a new reply to a post',
@@ -63,7 +64,6 @@ export class RepliesController {
   })
   @ApiResponse({ status: 405, description: 'Invalid input' })
   @ApiCookieAuth()
-  @UsePipes(new JoiValidatorPipe(createReplySchema))
   async createReply(
     @Param('id', ParseIntPipe) id: number,
     @Body() createReplyDto: CreateReplyDto,
@@ -71,7 +71,17 @@ export class RepliesController {
   ) {
     try {
       const userId = req.user.id;
-      return await this.repliesService.createReply(createReplyDto, id, userId);
+      const response = await this.repliesService.createReply(
+        createReplyDto,
+        id,
+        userId,
+      );
+      delete response.user.hash;
+      delete response.user.createdAt;
+      delete response.user.updatedAt;
+      delete response.user.imageURL;
+      delete response.user.email;
+      return response;
     } catch (error) {
       throw new InternalServerErrorException('Something went wrong', {
         cause: error,
