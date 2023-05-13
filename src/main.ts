@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import { ConfigService } from '@nestjs/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as path from 'path';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   // const app = await NestFactory.create(AppModule);
@@ -13,10 +14,12 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const cookieSecret = configService.get<string>('COOKIE_SECRET');
 
+  app.useGlobalPipes(new ValidationPipe());
   app.enableCors();
   app.use(helmet());
   app.use(cookieParser(cookieSecret));
   // serving images is for future use whenever there will be a need to incorporate image posting
+  // currently being used to serve user profile images
   app.useStaticAssets(path.join(__dirname, '..', 'public'));
 
   const config = new DocumentBuilder()

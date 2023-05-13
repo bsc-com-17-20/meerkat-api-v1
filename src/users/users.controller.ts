@@ -10,9 +10,11 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Req,
   Request,
   UseGuards,
   UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import {
   CreateUserDto,
@@ -112,7 +114,8 @@ export class UsersController {
   @ApiResponse({ status: 401, description: 'Unauthorized operation' })
   @ApiResponse({ status: 405, description: 'Invalid input' })
   @ApiCookieAuth()
-  @UsePipes(new JoiValidatorPipe(createUserSchema))
+  @UsePipes(new ValidationPipe())
+  // @UsePipes(new JoiValidatorPipe(createUserSchema))
   async createUser(@Body() createUserDto: CreateUserDto) {
     try {
       return await this.usersService.createUser(createUserDto);
@@ -134,8 +137,9 @@ export class UsersController {
   @ApiResponse({ status: 401, description: 'Unauthorized operation' })
   @ApiResponse({ status: 405, description: 'Invalid input' })
   @ApiCookieAuth()
-  @UsePipes(new JoiValidatorPipe(updateUserSchema))
-  async updateUser(@Request() req, @Body() updateUserDto: UpdateUserDto) {
+  @UsePipes(new ValidationPipe())
+  // @UsePipes(new JoiValidatorPipe(updateUserSchema))
+  async updateUser(@Req() req, @Body() updateUserDto: UpdateUserDto) {
     try {
       let { id } = req.user;
       this.logger.log(id);
@@ -148,7 +152,7 @@ export class UsersController {
     }
   }
 
-  @Delete()
+  @Delete(':username')
   @ApiOperation({
     summary: 'Deletes a user',
     description: 'Delete a user',
@@ -158,9 +162,9 @@ export class UsersController {
   @ApiResponse({ status: 401, description: 'Unauthorized operation' })
   @ApiResponse({ status: 400, description: 'Invalid user value' })
   @ApiCookieAuth()
-  async deleteUser(@Request() req) {
+  async deleteUser(@Req() req) {
     try {
-      return await this.usersService.deleteuser(req.user.id);
+      return await this.usersService.deleteuser(req.user.username);
     } catch (error) {
       throw new InternalServerErrorException('Something went wrong', {
         cause: error,

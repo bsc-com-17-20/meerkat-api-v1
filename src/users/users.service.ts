@@ -98,12 +98,14 @@ export class UsersService {
     }
   }
 
-  async deleteuser(id: number): Promise<DeleteResult> {
+  async deleteuser(username: string): Promise<DeleteResult> {
     try {
-      await this.fetchUser(id);
-      return this.userRepository.delete({ id });
+      await this.findOne(username);
+      return this.userRepository.delete({ username });
     } catch (error) {
-      throw new Error(`Error deleting user with id: ${id}: ${error.message}`);
+      throw new Error(
+        `Error deleting user with id: ${username}: ${error.message}`,
+      );
     }
   }
 }

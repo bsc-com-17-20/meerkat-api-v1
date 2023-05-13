@@ -20,7 +20,7 @@ import {
   createReplySchema,
   editReplySchema,
 } from './dtos';
-import { JoiValidatorPipe } from '../utils/validation.pipe';
+// import { JoiValidatorPipe } from '../utils/validation.pipe';
 import {
   ApiCookieAuth,
   ApiOperation,
@@ -55,7 +55,7 @@ export class RepliesController {
   }
 
   @Post(':id')
-  @UsePipes(new JoiValidatorPipe(createReplySchema))
+  // @UsePipes(new JoiValidatorPipe(createReplySchema))
   @ApiOperation({
     summary: 'Add a new reply',
     description: 'Create a new reply to a post',
@@ -74,12 +74,12 @@ export class RepliesController {
   // Do not use @Params() it is confilcting with the JoiValidator and messing up the validation use
   // manual req.params instead
   async createReply(
-    // @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() createReplyDto: CreateReplyDto,
     @Req() req,
   ) {
     try {
-      const { id } = req.params;
+      // const { id } = req.params;
       const userId = req.user.id;
       const response = await this.repliesService.createReply(
         createReplyDto,
@@ -116,17 +116,17 @@ export class RepliesController {
   })
   @ApiResponse({ status: 405, description: 'Invalid input' })
   @ApiCookieAuth()
-  @UsePipes(new JoiValidatorPipe(editReplySchema))
+  // @UsePipes(new JoiValidatorPipe(editReplySchema))
   // Do not use @Params() it is confilcting with the JoiValidator and messing up the validation use
   // manual req.params instead
   async updateReply(
-    // @Param('postId', ParseIntPipe) postId: number,
-    // @Param('replyId', ParseIntPipe) replyId: number,
+    @Param('postId', ParseIntPipe) postId: number,
+    @Param('replyId', ParseIntPipe) replyId: number,
     @Body() editReplyDto: EditReplyDto,
     @Req() req,
   ) {
     try {
-      const { postId, replyId } = req.params;
+      // const { postId, replyId } = req.params;
       const userId = req.user.id;
       return await this.repliesService.updateReply(
         editReplyDto,

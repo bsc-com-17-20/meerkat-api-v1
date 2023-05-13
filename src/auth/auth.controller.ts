@@ -6,19 +6,18 @@ import {
   InternalServerErrorException,
   Logger,
   Post,
+  Req,
   Request,
   Res,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
-import { LocalAuthGuard, JwtAuthGuard } from './guards';
+import { LocalAuthGuard } from './guards';
 import { AuthService } from './auth.service';
 import {
-  ApiBody,
   ApiCookieAuth,
   ApiOperation,
   ApiResponse,
-  ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
 import { Response } from 'express';
@@ -47,7 +46,7 @@ export class AuthController {
       'Successfully authenticated ' + 'The JWT is returned in a cookie',
   })
   @ApiResponse({ status: 405, description: 'Invalid input' })
-  @UsePipes(new JoiValidatorPipe(loginUserSchema))
+  // @UsePipes(new JoiValidatorPipe(loginUserSchema))
   async login(
     @Body() loginUserDto: LoginUserDto,
     @Request() req,
@@ -57,7 +56,11 @@ export class AuthController {
     this.logger.log(loginUserDto);
     const user = this.authService.login(req.user);
     const token = (await user).access_token;
-    res.cookie('token', `${token}`, { signed: true, httpOnly: true });
+    res.cookie('token', `${token}`, {
+      signed: true,
+      httpOnly: true,
+      // secure: true,
+    });
     return this.authService.login(req.user);
   }
 
@@ -72,7 +75,7 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Unauthorized operation' })
   @ApiResponse({ status: 405, description: 'Invalid input' })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
-  @UsePipes(new JoiValidatorPipe(createUserSchema))
+  // @UsePipes(new JoiValidatorPipe(createUserSchema))
   async register(@Body() createUserDto: CreateUserDto) {
     try {
       return await this.authService.register(createUserDto);
@@ -93,7 +96,7 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Unauthorized operation' })
   @ApiResponse({ status: 405, description: 'Invalid input' })
   @ApiCookieAuth()
-  getProfile(@Request() req) {
+  getProfile(@Req() req) {
     this.logger.log(req.user.id);
     return this.authService.profile(req.user.id);
   }

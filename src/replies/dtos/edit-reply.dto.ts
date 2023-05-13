@@ -1,3 +1,4 @@
+import { IsNotEmpty, IsString } from 'class-validator';
 import * as Joi from 'joi';
 
 export const editReplySchema = Joi.object({
@@ -7,5 +8,7 @@ export const editReplySchema = Joi.object({
 });
 
 export class EditReplyDto {
+  @IsString()
+  @IsNotEmpty()
   content: string;
 }

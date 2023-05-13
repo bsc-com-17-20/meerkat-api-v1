@@ -145,13 +145,11 @@ describe('App (e2e)', () => {
     });
   });
 
-  describe('DELETE /users/:id', () => {
-    it('should delete the user and return 200 for succeful operation', async () => {
+  describe('DELETE /users/:username', () => {
+    it('should delete the user and return 200 for successful operation', async () => {
       const agent = request.agent(app.getHttpServer());
       await agent.post('/auth/login').send(account).expect(201);
-      const response = await agent.get(`/users/${account.username}`);
-      const { id } = response.body;
-      await agent.delete(`/users/${id}`).expect(200);
+      await agent.delete(`/users/${account.username}`).expect(200);
     });
   });
 

@@ -198,12 +198,13 @@ describe('UsersService', () => {
 
   describe('deleteUser', () => {
     it('should delete a user object and return a DeleteResult object', async () => {
-      const expectedFetchUserSpyResult: ResponseUserDto = {
+      const expectedFetchUserSpyResult: User = {
         id: 1,
         role: expect.any(String),
         username: expect.any(String),
         email: expect.any(String),
         imageURL: expect.any(String),
+        hash: expect.any(String),
         createdAt: expect.any(Date),
         updatedAt: expect.any(Date),
         posts: [],
@@ -214,14 +215,14 @@ describe('UsersService', () => {
         affected: 1,
       };
       const fetchUserSpy = jest
-        .spyOn(service, 'fetchUser')
+        .spyOn(service, 'findOne')
         .mockResolvedValue(expectedFetchUserSpyResult);
       const deleteSpy = jest
         .spyOn(userRepository, 'delete')
         .mockResolvedValue(expectedSpyResult);
-      const result = await service.deleteuser(1);
-      expect(fetchUserSpy).toBeCalledWith(1);
-      expect(deleteSpy).toBeCalledWith({ id: 1 });
+      const result = await service.deleteuser('dave');
+      expect(fetchUserSpy).toBeCalledWith('dave');
+      expect(deleteSpy).toBeCalledWith({ username: 'dave' });
       expect(result).toEqual(expectedSpyResult);
     });
   });

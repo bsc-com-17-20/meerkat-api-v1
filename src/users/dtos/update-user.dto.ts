@@ -1,4 +1,12 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsAlphanumeric,
+  IsEmail,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 import * as Joi from 'joi';
 
 export const updateUserSchema = Joi.object({
@@ -15,9 +23,24 @@ export const updateUserSchema = Joi.object({
 
 export class UpdateUserDto {
   @ApiPropertyOptional()
+  @IsString()
+  @IsAlphanumeric()
+  @Min(3)
+  @Max(30)
+  @IsOptional()
   username: string;
+
   @ApiPropertyOptional()
+  @IsString()
+  @IsEmail()
+  @IsOptional()
   email: string;
+
   @ApiPropertyOptional()
+  @IsString()
+  @IsAlphanumeric()
+  @Min(8)
+  @Max(100)
+  @IsOptional()
   password: string;
 }
