@@ -15,17 +15,8 @@ export const loginUserSchema = Joi.object({
 
 export class LoginUserDto {
   @ApiProperty({ example: 'luffy' })
-  @IsString()
-  @IsAlphanumeric()
-  @Min(3)
-  @Max(30)
-  @IsOptional()
   username: string;
+
   @ApiProperty({ example: 'Capta1nofTheStrawhat2' })
-  @IsString()
-  @IsAlphanumeric()
-  @Min(8)
-  @Max(100)
-  @IsOptional()
   password: string;
 }

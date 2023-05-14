@@ -18,6 +18,7 @@ async function bootstrap() {
   app.enableCors();
   app.use(helmet());
   app.use(cookieParser(cookieSecret));
+
   // serving images is for future use whenever there will be a need to incorporate image posting
   // currently being used to serve user profile images
   app.useStaticAssets(path.join(__dirname, '..', 'public'));

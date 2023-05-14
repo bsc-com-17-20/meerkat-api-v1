@@ -1,11 +1,4 @@
-import {
-  IsAlphanumeric,
-  IsEmail,
-  IsNotEmpty,
-  IsString,
-  Max,
-  Min,
-} from 'class-validator';
+import { IsAlphanumeric, IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import * as Joi from 'joi';
 
 export const createUserSchema = Joi.object({
@@ -21,19 +14,15 @@ export const createUserSchema = Joi.object({
 });
 
 export class CreateUserDto {
-  @IsString()
   @IsAlphanumeric()
-  @Min(3)
-  @Max(30)
   @IsNotEmpty()
   username: string;
-  @IsString()
+
   @IsEmail()
   @IsNotEmpty()
   email: string;
+
   @IsString()
-  @Min(8)
-  @Max(100)
   @IsNotEmpty()
   password: string;
 }

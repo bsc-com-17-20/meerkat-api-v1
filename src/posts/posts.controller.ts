@@ -62,8 +62,8 @@ export class PostsController {
 
   @Get(':boardId/:postId')
   @ApiOperation({
-    summary: 'List all posts under a board',
-    description: 'Gets all posts using a board id',
+    summary: 'List a post under a board',
+    description: 'Gets a post using a board id and post id',
     operationId: 'fetchPostsByBoardId',
   })
   @ApiResponse({
@@ -115,7 +115,20 @@ export class PostsController {
       // let { id } = req.params;
       // id = parseInt(id);
       const userId = req.user.id;
-      return await this.postsService.createPost(createPostDto, id, userId);
+      const post = await this.postsService.createPost(
+        createPostDto,
+        id,
+        userId,
+      );
+      delete post.user.hash;
+      delete post.user.email;
+      delete post.user.createdAt;
+      delete post.user.updatedAt;
+      delete post.user.posts;
+      delete post.user.replies;
+      delete post.user.imageURL;
+      delete post.board.createdAt;
+      return post;
     } catch (error) {
       throw new InternalServerErrorException('Something went wrong', {
         cause: error,
