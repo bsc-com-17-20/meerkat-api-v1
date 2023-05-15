@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as path from 'path';
 import { ValidationPipe } from '@nestjs/common';
+import { logger } from './utils/logging.middleware';
 
 async function bootstrap() {
   // const app = await NestFactory.create(AppModule);
@@ -18,7 +19,7 @@ async function bootstrap() {
   app.enableCors();
   app.use(helmet());
   app.use(cookieParser(cookieSecret));
-
+  app.use(logger);
   // serving images is for future use whenever there will be a need to incorporate image posting
   // currently being used to serve user profile images
   app.useStaticAssets(path.join(__dirname, '..', 'public'));
