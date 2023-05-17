@@ -78,7 +78,10 @@ export class AuthController {
   // @UsePipes(new JoiValidatorPipe(createUserSchema))
   async register(@Body() createUserDto: CreateUserDto) {
     try {
-      return await this.authService.register(createUserDto);
+      const user = await this.authService.register(createUserDto);
+      delete user.confimationCode;
+      delete user.hash;
+      return user;
     } catch (error) {
       throw new InternalServerErrorException('Someting went wrong', {
         cause: error,

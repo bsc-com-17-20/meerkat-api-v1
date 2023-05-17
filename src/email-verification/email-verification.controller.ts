@@ -1,5 +1,6 @@
-import { Controller, Param, Post } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { EmailVerificationService } from './email-verification.service';
+import { Public } from 'src/auth/decorators';
 
 @Controller('email-verification')
 export class EmailVerificationController {
@@ -7,7 +8,8 @@ export class EmailVerificationController {
     private readonly emailVerificationService: EmailVerificationService,
   ) {}
 
-  @Post(':confimationCode')
+  @Public()
+  @Get(':confimationCode')
   async verifyUser(@Param('confirmationCode') confirmationCode: string) {
     return await this.emailVerificationService.verifyUser(confirmationCode);
   }

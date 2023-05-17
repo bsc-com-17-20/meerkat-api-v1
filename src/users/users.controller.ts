@@ -7,7 +7,6 @@ import {
   Logger,
   NotFoundException,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   Req,
@@ -16,13 +15,7 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import {
-  CreateFullUserDto,
-  CreateUserDto,
-  UpdateUserDto,
-  createUserSchema,
-  updateUserSchema,
-} from './dtos';
+import { CreateFullUserDto, UpdateUserDto } from './dtos';
 import { UsersService } from './users.service';
 import {
   ApiCookieAuth,
@@ -60,27 +53,6 @@ export class UsersController {
       });
     }
   }
-
-  // @Get(':id')
-  // @ApiOperation({
-  //   summary: 'Find user by ID',
-  //   description: 'Returns a single user',
-  //   operationId: 'fetchUser',
-  // })
-  // @ApiResponse({ status: 200, description: 'Successful operation' })
-  // @ApiResponse({ status: 401, description: 'Unauthorized operation' })
-  // @ApiResponse({ status: 400, description: 'Invalid status value' })
-  // @ApiCookieAuth()
-  // async getUser(@Param('id', ParseIntPipe) id: number) {
-  //   try {
-  //     return await this.usersService.fetchUser(id);
-  //   } catch (error) {
-  //     throw new NotFoundException(`Something went wrong`, {
-  //       cause: error,
-  //       description: `${error.message}`,
-  //     });
-  //   }
-  // }
 
   @Get(':user')
   @ApiOperation({
@@ -121,7 +93,10 @@ export class UsersController {
   // @UsePipes(new JoiValidatorPipe(createUserSchema))
   async createFullUser(@Body() createFullUserDto: CreateFullUserDto) {
     try {
-      return await this.usersService.createFullUser(createFullUserDto);
+      const user = await this.usersService.createFullUser(createFullUserDto);
+      delete user.hash;
+      delete user.confimationCode;
+      return user;
     } catch (error) {
       throw new InternalServerErrorException('Someting went wrong', {
         cause: error,

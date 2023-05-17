@@ -46,8 +46,8 @@ import { EmailVerificationModule } from './email-verification/email-verification
         port: 587,
         secure: false,
         auth: {
-          user: 'benedictzuze@gmail.com',
-          pass: 'ebucwnxxghlgpqpy',
+          user: process.env.USER,
+          pass: process.env.PASS,
         },
       },
     }),

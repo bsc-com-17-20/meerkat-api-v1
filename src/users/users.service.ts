@@ -65,6 +65,16 @@ export class UsersService {
     }
   }
 
+  token() {
+    const characters =
+      '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let token = '';
+    for (let i = 0; i < 25; i++) {
+      token += characters[Math.floor(Math.random() * characters.length)];
+    }
+    return token;
+  }
+
   async createUser(userDetails: CreateUserDto): Promise<User> {
     try {
       const options = {
@@ -75,10 +85,7 @@ export class UsersService {
       this.logger.log({ ...userDetails });
       const salt = await bcrypt.genSalt();
       const hash = await bcrypt.hash(userDetails.password, salt);
-      const confimationCode = jwt.sign(
-        { email: userDetails.email },
-        process.env.JWT_SECRET,
-      );
+      const confimationCode = this.token();
       const user = {
         username: userDetails.username,
         email: userDetails.email,
@@ -111,10 +118,7 @@ export class UsersService {
       this.logger.log({ ...userDetails });
       const salt = await bcrypt.genSalt();
       const hash = await bcrypt.hash(userDetails.password, salt);
-      const confimationCode = jwt.sign(
-        { email: userDetails.email },
-        process.env.JWT_SECRET,
-      );
+      const confimationCode = this.token();
       let role: Role;
       if (userDetails.role === 'admin') {
         role = Role.ADMIN;
