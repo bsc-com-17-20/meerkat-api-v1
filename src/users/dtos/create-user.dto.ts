@@ -14,16 +14,15 @@ export const createUserSchema = Joi.object({
 });
 
 export class CreateUserDto {
-  @IsAlphanumeric()
-  @IsNotEmpty()
+  // @IsAlphanumeric()
+  // @IsNotEmpty()
   username: string;
 
-  @IsEmail()
-  @IsNotEmpty()
+  // @IsEmail()
+  // @IsNotEmpty()
   email: string;
 
-  @IsString()
-  @IsNotEmpty()
+  // @IsNotEmpty()
   password: string;
 }
 

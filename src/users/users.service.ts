@@ -8,15 +8,18 @@ import {
   ResponseUserDto,
   UpdateUserDto,
 } from './dtos';
+import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 import * as download from 'image-downloader';
 import { Role } from './models/role.enum';
+import { EmailVerificationService } from '../email-verification/email-verification.service';
 
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    private readonly emailVerificationService: EmailVerificationService,
   ) {}
 
   async fetchUsers(): Promise<ResponseUserDto[]> {
@@ -72,17 +75,26 @@ export class UsersService {
       this.logger.log({ ...userDetails });
       const salt = await bcrypt.genSalt();
       const hash = await bcrypt.hash(userDetails.password, salt);
+      const confimationCode = jwt.sign(
+        { email: userDetails.email },
+        process.env.JWT_SECRET,
+      );
       const user = {
         username: userDetails.username,
         email: userDetails.email,
         imageURL: avatarPath,
         hash: hash,
+        confimationCode: confimationCode,
       };
       this.logger.log({ ...user });
       const newUser = this.userRepository.create({ ...user });
       const savedUser = this.userRepository.save(newUser);
-      const result = await download.image(options);
-      // console.log(result.filename);
+      await download.image(options);
+      this.emailVerificationService.sendEmail(
+        userDetails.username,
+        userDetails.email,
+        confimationCode,
+      );
       return savedUser;
     } catch (error) {
       throw new Error(`Error creating user: ${error.message}`);
@@ -99,7 +111,11 @@ export class UsersService {
       this.logger.log({ ...userDetails });
       const salt = await bcrypt.genSalt();
       const hash = await bcrypt.hash(userDetails.password, salt);
-      let role;
+      const confimationCode = jwt.sign(
+        { email: userDetails.email },
+        process.env.JWT_SECRET,
+      );
+      let role: Role;
       if (userDetails.role === 'admin') {
         role = Role.ADMIN;
       } else if (userDetails.role === 'user') {
@@ -113,12 +129,17 @@ export class UsersService {
         role,
         imageURL: avatarPath,
         hash: hash,
+        confimationCode: confimationCode,
       };
       this.logger.log({ ...user });
       const newUser = this.userRepository.create({ ...user });
       const savedUser = this.userRepository.save(newUser);
-      const result = await download.image(options);
-      // console.log(result.filename);
+      await download.image(options);
+      await this.emailVerificationService.sendEmail(
+        userDetails.username,
+        userDetails.email,
+        confimationCode,
+      );
       return savedUser;
     } catch (error) {
       throw new Error(`Error creating user: ${error.message}`);

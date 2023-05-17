@@ -13,6 +13,8 @@ import { Reply } from './replies/models/replies.entity';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/guards';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { EmailVerificationModule } from './email-verification/email-verification.module';
 
 @Module({
   imports: [
@@ -26,6 +28,9 @@ import { JwtAuthGuard } from './auth/guards';
         password: process.env.DATABASE_PASSWORD,
         database: process.env.DATABASE_NAME,
         entities: [User, Board, Post, Reply],
+        migrations: [
+          /*...*/
+        ],
         synchronize: true,
       }),
     }),
@@ -35,11 +40,23 @@ import { JwtAuthGuard } from './auth/guards';
         limit: 10, // number of requests per ttl value
       }),
     }),
+    MailerModule.forRoot({
+      transport: {
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: 'benedictzuze@gmail.com',
+          pass: 'ebucwnxxghlgpqpy',
+        },
+      },
+    }),
     UsersModule,
     BoardsModule,
     PostsModule,
     AuthModule,
     RepliesModule,
+    EmailVerificationModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
