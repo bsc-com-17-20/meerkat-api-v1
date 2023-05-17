@@ -15,6 +15,6 @@ export class Board {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  @OneToMany(() => Post, (post) => post.board, {})
+  @OneToMany(() => Post, (post) => post.board, { cascade: true })
   posts: Post[];
 }

@@ -26,3 +26,21 @@ export class CreateUserDto {
   @IsNotEmpty()
   password: string;
 }
+
+// used to manually set a role for a user
+export class CreateFullUserDto {
+  @IsAlphanumeric()
+  @IsNotEmpty()
+  username: string;
+
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+  @IsString()
+  role: string;
+
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+}

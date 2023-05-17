@@ -17,6 +17,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import {
+  CreateFullUserDto,
   CreateUserDto,
   UpdateUserDto,
   createUserSchema,
@@ -31,6 +32,7 @@ import {
 } from '@nestjs/swagger';
 import { JoiValidatorPipe } from '../utils/validation.pipe';
 import { RolesAuthGuard } from 'src/auth/guards';
+import { Public } from 'src/auth/decorators';
 
 @ApiTags('users')
 @Controller('users')
@@ -103,6 +105,7 @@ export class UsersController {
   }
 
   // @UseGuards(new RolesAuthGuard('admin'))
+  @Public() // remember to remove
   @Post()
   @ApiOperation({
     summary: 'Admin: Add a new user',
@@ -116,9 +119,9 @@ export class UsersController {
   @ApiCookieAuth()
   @UsePipes(new ValidationPipe())
   // @UsePipes(new JoiValidatorPipe(createUserSchema))
-  async createUser(@Body() createUserDto: CreateUserDto) {
+  async createFullUser(@Body() createFullUserDto: CreateFullUserDto) {
     try {
-      return await this.usersService.createUser(createUserDto);
+      return await this.usersService.createFullUser(createFullUserDto);
     } catch (error) {
       throw new InternalServerErrorException('Someting went wrong', {
         cause: error,

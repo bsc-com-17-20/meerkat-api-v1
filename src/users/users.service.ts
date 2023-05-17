@@ -2,9 +2,15 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './models/users.entity';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
-import { CreateUserDto, ResponseUserDto, UpdateUserDto } from './dtos';
+import {
+  CreateFullUserDto,
+  CreateUserDto,
+  ResponseUserDto,
+  UpdateUserDto,
+} from './dtos';
 import * as bcrypt from 'bcrypt';
 import * as download from 'image-downloader';
+import { Role } from './models/role.enum';
 
 @Injectable()
 export class UsersService {
@@ -69,6 +75,42 @@ export class UsersService {
       const user = {
         username: userDetails.username,
         email: userDetails.email,
+        imageURL: avatarPath,
+        hash: hash,
+      };
+      this.logger.log({ ...user });
+      const newUser = this.userRepository.create({ ...user });
+      const savedUser = this.userRepository.save(newUser);
+      const result = await download.image(options);
+      // console.log(result.filename);
+      return savedUser;
+    } catch (error) {
+      throw new Error(`Error creating user: ${error.message}`);
+    }
+  }
+
+  async createFullUser(userDetails: CreateFullUserDto): Promise<User> {
+    try {
+      const options = {
+        url: `https://api.dicebear.com/6.x/thumbs/svg?seed=${userDetails.username}`,
+        dest: `../../public/avatars/${userDetails.username}.svg`,
+      };
+      const avatarPath = `/avatars/${userDetails.username}.svg`;
+      this.logger.log({ ...userDetails });
+      const salt = await bcrypt.genSalt();
+      const hash = await bcrypt.hash(userDetails.password, salt);
+      let role;
+      if (userDetails.role === 'admin') {
+        role = Role.ADMIN;
+      } else if (userDetails.role === 'user') {
+        role = Role.USER;
+      } else {
+        throw Error('role type is invalid');
+      }
+      const user = {
+        username: userDetails.username,
+        email: userDetails.email,
+        role,
         imageURL: avatarPath,
         hash: hash,
       };
