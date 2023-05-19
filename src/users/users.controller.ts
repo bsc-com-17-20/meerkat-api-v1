@@ -40,7 +40,7 @@ export class UsersController {
     description: 'This route retrieves the information if all users.',
     operationId: 'fetchUsers',
   })
-  @ApiResponse({ status: 200, description: 'User found' })
+  @ApiResponse({ status: 200, description: 'Users found' })
   @ApiResponse({ status: 401, description: 'Unauthorized operation' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
   @ApiCookieAuth()

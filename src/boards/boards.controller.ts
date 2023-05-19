@@ -22,8 +22,10 @@ import {
   editBoardSchema,
 } from './dtos';
 import {
+  ApiBody,
   ApiCookieAuth,
   ApiOperation,
+  ApiParam,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -31,7 +33,7 @@ import { RolesAuthGuard } from '../auth/guards';
 import { Public } from '../auth/decorators';
 // import { JoiValidatorPipe } from '../utils/validation.pipe';
 
-@ApiTags('boards')
+@ApiTags('Boards')
 @Controller('boards')
 export class BoardsController {
   constructor(private boardsService: BoardsService) {}
@@ -39,24 +41,18 @@ export class BoardsController {
   @Public()
   @Get()
   @ApiOperation({
-    summary: 'List all boards',
-    description: 'Returns an array containing all the boards in the database',
+    summary: 'Get all boards',
+    description: 'This route retrieves the details of all boards.',
     operationId: 'fetchBoards',
   })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Successful operation',
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description: 'Unauthorized operation',
-  })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
+  @ApiResponse({ status: 200, description: 'Boards found' })
+  @ApiResponse({ status: 401, description: 'Unauthorized operation' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   async getBoards() {
     try {
       return await this.boardsService.fetchBoards();
     } catch (error) {
-      throw new NotFoundException(`Something went wrong`, {
+      throw new InternalServerErrorException(`Something went wrong`, {
         cause: error,
         description: `${error.message}`,
       });
@@ -66,18 +62,14 @@ export class BoardsController {
   @Post()
   @ApiOperation({
     summary: 'Admin: Create a new board',
-    description: 'Creates a new board',
+    description: 'This route allows creating a new board',
     operationId: 'createBoard',
   })
-  @ApiResponse({
-    status: HttpStatus.CREATED,
-    description: 'Successful operation',
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description: 'Unauthorized operation',
-  })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
+  @ApiBody({ description: 'Board details for creation' })
+  @ApiResponse({ status: 201, description: 'Board created successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid request payload' })
+  @ApiResponse({ status: 401, description: 'Unauthorized operation' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   @ApiCookieAuth()
   @UseGuards(new RolesAuthGuard('admin'))
   // @UsePipes(new JoiValidatorPipe(createBoardSchema))
@@ -94,19 +86,17 @@ export class BoardsController {
 
   @Patch(':id')
   @ApiOperation({
-    summary: 'Admin: Edit a board using form data',
-    description: 'Edits a board using form data',
+    summary: 'Admin: Update a board',
+    description:
+      'This route allows updating the details of a specific board identified by its boardId.',
     operationId: 'updateBoard',
   })
-  @ApiResponse({
-    status: HttpStatus.CREATED,
-    description: 'Successful operation',
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description: 'Unauthorized operation',
-  })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
+  @ApiBody({ description: 'Updated board details' })
+  @ApiResponse({ status: 200, description: 'Board updated successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid request payload' })
+  @ApiResponse({ status: 401, description: 'Unauthorized operation' })
+  @ApiResponse({ status: 404, description: 'Board not found' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   @ApiCookieAuth()
   @UseGuards(new RolesAuthGuard('admin'))
   // @UsePipes(new JoiValidatorPipe(editBoardSchema))
@@ -130,19 +120,15 @@ export class BoardsController {
 
   @Delete(':id')
   @ApiOperation({
-    summary: 'Admin: Deletes a board',
-    description: 'Deletes a board',
+    summary: 'Admin: Delete a board',
+    description:
+      'This route allows deleting a specific board identified by its boardId.',
     operationId: 'deleteBoard',
   })
-  @ApiResponse({
-    status: HttpStatus.ACCEPTED,
-    description: 'Successful operation',
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description: 'Unauthorized operation',
-  })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
+  @ApiResponse({ status: 204, description: 'Board deleted successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized operation' })
+  @ApiResponse({ status: 404, description: 'Board not found' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   @ApiCookieAuth()
   @UseGuards(new RolesAuthGuard('admin'))
   async deleteBoard(@Param('id', ParseIntPipe) id: number) {
