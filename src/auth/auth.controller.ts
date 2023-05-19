@@ -15,6 +15,7 @@ import {
 import { LocalAuthGuard } from './guards';
 import { AuthService } from './auth.service';
 import {
+  ApiBody,
   ApiCookieAuth,
   ApiOperation,
   ApiResponse,
@@ -26,7 +27,7 @@ import { JoiValidatorPipe } from '../utils/validation.pipe';
 import { CreateUserDto, createUserSchema } from '../users/dtos';
 import { LoginUserDto, loginUserSchema } from './dtos';
 
-@ApiTags('auth')
+@ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
@@ -36,16 +37,19 @@ export class AuthController {
   @Post('login')
   @UseGuards(LocalAuthGuard)
   @ApiOperation({
-    summary: 'Logs in and return the authentication cookie',
-    description: 'Authenticates a user by providing a JWT access token',
+    summary: 'User login',
+    description:
+      'This route allows users to log in and obtain an authentication token (JWT).',
     operationId: 'login',
   })
+  @ApiBody({ description: 'User credentials for login' })
   @ApiResponse({
     status: 200,
-    description:
-      'Successfully authenticated ' + 'The JWT is returned in a cookie',
+    description: 'User logged in successfully',
   })
-  @ApiResponse({ status: 405, description: 'Invalid input' })
+  @ApiResponse({ status: 400, description: 'Invalid request payload' })
+  @ApiResponse({ status: 401, description: 'Unauthorized login attemp' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   // @UsePipes(new JoiValidatorPipe(loginUserSchema))
   async login(
     @Body() loginUserDto: LoginUserDto,
@@ -67,14 +71,15 @@ export class AuthController {
   @Public()
   @Post('register')
   @ApiOperation({
-    summary: 'Add a new user',
-    description: 'Add a new user',
+    summary: 'User registration',
+    description:
+      'This route allows users to register and create a new account.',
     operationId: 'createUser',
   })
-  @ApiResponse({ status: 201, description: 'Successful operation' })
-  @ApiResponse({ status: 401, description: 'Unauthorized operation' })
-  @ApiResponse({ status: 405, description: 'Invalid input' })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
+  @ApiBody({ description: 'User details for registration' })
+  @ApiResponse({ status: 201, description: 'User registrated successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid request payload' })
+  @ApiResponse({ status: 405, description: 'Internal server error' })
   // @UsePipes(new JoiValidatorPipe(createUserSchema))
   async register(@Body() createUserDto: CreateUserDto) {
     try {
@@ -92,15 +97,26 @@ export class AuthController {
 
   @Get('profile')
   @ApiOperation({
-    summary: "View a user's profile",
-    description: "Returns a user's details",
+    summary: 'Get user profile',
+    description:
+      'This route allows users to view their own profile information.',
   })
-  @ApiResponse({ status: 200, description: 'Successful operation' })
+  @ApiResponse({
+    status: 200,
+    description: 'User profile retrieved successfully',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized operation' })
-  @ApiResponse({ status: 405, description: 'Invalid input' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   @ApiCookieAuth()
   getProfile(@Req() req) {
-    this.logger.log(req.user.id);
-    return this.authService.profile(req.user.id);
+    try {
+      this.logger.log(req.user.id);
+      return this.authService.profile(req.user.id);
+    } catch (error) {
+      throw new InternalServerErrorException('Someting went wrong', {
+        cause: error,
+        description: `${error.message}`,
+      });
+    }
   }
 }

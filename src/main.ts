@@ -43,18 +43,18 @@ async function bootstrap() {
     )
     .setVersion('1.0')
     .addTag(
-      'auth',
+      'Auth',
       'All about authentication and authorization, View a user profile. Use the login route first to access all routes',
     )
-    .addTag('users', 'Everything about the user')
+    .addTag('Users', 'Everything about the user')
     .addTag(
-      'boards',
+      'Boards',
       'Discussion groups/boards that contain related posts and replies',
     )
-    .addTag('posts', 'Everything about a post')
-    .addTag('replies', 'Everthing about a reply')
+    .addTag('Posts', 'Everything about a post')
+    .addTag('Replies', 'Everthing about a reply')
     .addTag(
-      'email-verification',
+      'Email-verification',
       'Route used by a user to activatate their account',
     )
     .build();
