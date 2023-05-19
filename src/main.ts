@@ -53,6 +53,10 @@ async function bootstrap() {
     )
     .addTag('posts', 'Everything about a post')
     .addTag('replies', 'Everthing about a reply')
+    .addTag(
+      'email-verification',
+      'Route used by a user to activatate their account',
+    )
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

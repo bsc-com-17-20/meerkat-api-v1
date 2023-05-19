@@ -15,7 +15,7 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { CreateFullUserDto, UpdateUserDto } from './dtos';
+import { CreateFullUserDto, ResponseUserDto, UpdateUserDto } from './dtos';
 import { UsersService } from './users.service';
 import {
   ApiCookieAuth,
@@ -26,6 +26,7 @@ import {
 import { JoiValidatorPipe } from '../utils/validation.pipe';
 import { RolesAuthGuard } from 'src/auth/guards';
 import { Public } from 'src/auth/decorators';
+import { User } from './models/users.entity';
 
 @ApiTags('users')
 @Controller('users')
@@ -35,19 +36,19 @@ export class UsersController {
 
   @Get()
   @ApiOperation({
-    summary: 'Finds all users',
-    description: 'Get all users',
+    summary: 'Get all users',
+    description: 'This route retrieves the information if all users.',
     operationId: 'fetchUsers',
   })
-  @ApiResponse({ status: 200, description: 'Successful operation' })
+  @ApiResponse({ status: 200, description: 'User found' })
   @ApiResponse({ status: 401, description: 'Unauthorized operation' })
-  @ApiResponse({ status: 400, description: 'Invalid status value' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   @ApiCookieAuth()
-  async getUsers() {
+  async getUsers(): Promise<ResponseUserDto[]> {
     try {
       return await this.usersService.fetchUsers();
     } catch (error) {
-      throw new NotFoundException(`Something went wrong`, {
+      throw new InternalServerErrorException(`Something went wrong`, {
         cause: error,
         description: `${error.message}`,
       });
@@ -56,20 +57,22 @@ export class UsersController {
 
   @Get(':user')
   @ApiOperation({
-    summary: 'Find user using their username',
-    description: 'Returns a single user',
+    summary: 'Get a user by username',
+    description:
+      'This route retrieves the user information for a specific user identified by their userId.',
     operationId: 'findOne',
   })
-  @ApiResponse({ status: 200, description: 'Successful operation' })
+  @ApiResponse({ status: 200, description: 'User found' })
   @ApiResponse({ status: 401, description: 'Unauthorized operation' })
-  @ApiResponse({ status: 400, description: 'Invalid status value' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   @ApiCookieAuth()
   async getUserByUsername(@Param('user') username: string) {
     try {
       const { hash, ...result } = await this.usersService.findOne(username);
       return result;
     } catch (error) {
-      throw new NotFoundException(`Something went wrong`, {
+      throw new InternalServerErrorException(`Something went wrong`, {
         cause: error,
         description: `${error.message}`,
       });
@@ -80,14 +83,18 @@ export class UsersController {
   @Public() // remember to remove
   @Post()
   @ApiOperation({
-    summary: 'Admin: Add a new user',
+    summary: 'Admin: Create a new user and generate an avatar',
     description:
-      'Add a new user, user privaledged user creation is via /auth/register route.',
+      'This route allows creating a new user by providing the necessary details. ' +
+      'Upon successful creation, an avatar for the user is generated using the DiceBears API.' +
+      'The user creation route, however, is limited to admin privileges.' +
+      'Regular users can utilize the "auth/register" route to create their accounts. ',
     operationId: 'createUser',
   })
-  @ApiResponse({ status: 200, description: 'Successful operation' })
+  @ApiResponse({ status: 201, description: 'User created successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid request payload' })
   @ApiResponse({ status: 401, description: 'Unauthorized operation' })
-  @ApiResponse({ status: 405, description: 'Invalid input' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   @ApiCookieAuth()
   @UsePipes(new ValidationPipe())
   // @UsePipes(new JoiValidatorPipe(createUserSchema))
@@ -107,13 +114,17 @@ export class UsersController {
 
   @Patch()
   @ApiOperation({
-    summary: 'Updates a user with form data',
-    description: 'Updates a user with form data',
+    summary: 'Update user infromation',
+    description:
+      'This route allows updating the information of a specific user identified by their userId.' +
+      'Since a user requires to be logged in to update their userId is taken from their jwt stored in the cookie jar',
     operationId: 'updateUser',
   })
-  @ApiResponse({ status: 200, description: 'Successful operation' })
+  @ApiResponse({ status: 200, description: 'User updated successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid request payload' })
   @ApiResponse({ status: 401, description: 'Unauthorized operation' })
-  @ApiResponse({ status: 405, description: 'Invalid input' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   @ApiCookieAuth()
   @UsePipes(new ValidationPipe())
   // @UsePipes(new JoiValidatorPipe(updateUserSchema))
@@ -130,15 +141,18 @@ export class UsersController {
     }
   }
 
-  @Delete(':username')
+  @Delete()
   @ApiOperation({
-    summary: 'Deletes a user',
-    description: 'Delete a user',
+    summary: 'Delete user',
+    description:
+      'This route allows deleting a specific user identified by their userId.' +
+      'Since a user requires to be logged in to update their userId is taken from their jwt stored in the cookie jar',
     operationId: 'deleteUser',
   })
-  @ApiResponse({ status: 200, description: 'Successful operation' })
+  @ApiResponse({ status: 204, description: 'User deleted successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized operation' })
-  @ApiResponse({ status: 400, description: 'Invalid user value' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   @ApiCookieAuth()
   async deleteUser(@Req() req) {
     try {

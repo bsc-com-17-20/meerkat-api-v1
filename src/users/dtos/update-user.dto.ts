@@ -4,8 +4,8 @@ import {
   IsEmail,
   IsOptional,
   IsString,
-  Max,
-  Min,
+  MaxLength,
+  MinLength,
 } from 'class-validator';
 import * as Joi from 'joi';
 
@@ -25,8 +25,8 @@ export class UpdateUserDto {
   @ApiPropertyOptional()
   @IsString()
   @IsAlphanumeric()
-  @Min(3)
-  @Max(30)
+  @MinLength(3)
+  @MaxLength(30)
   @IsOptional()
   username: string;
 
@@ -39,8 +39,8 @@ export class UpdateUserDto {
   @ApiPropertyOptional()
   @IsString()
   @IsAlphanumeric()
-  @Min(8)
-  @Max(100)
+  @MinLength(8)
+  @MaxLength(100)
   @IsOptional()
   password: string;
 }

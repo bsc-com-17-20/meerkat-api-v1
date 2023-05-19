@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsAlphanumeric,
-  IsNotEmpty,
-  IsString,
-  Max,
-  Min,
-} from 'class-validator';
+import { IsNotEmpty, IsString, MinLength } from 'class-validator';
 import * as Joi from 'joi';
 
 export const createBoardSchema = Joi.object({
@@ -18,15 +12,13 @@ export const createBoardSchema = Joi.object({
 export class CreateBoardDto {
   @ApiProperty({ example: 'Computer science' })
   @IsString()
-  @IsAlphanumeric()
-  @Min(3)
-  @Max(30)
   @IsNotEmpty()
+  @MinLength(3)
   name: string;
 
   @ApiProperty({ example: 'Anything and everything Computer' })
   @IsString()
-  @Min(5)
   @IsNotEmpty()
+  @MinLength(3)
   description: string;
 }

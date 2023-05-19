@@ -1,4 +1,11 @@
-import { IsAlphanumeric, IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsAlphanumeric,
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import * as Joi from 'joi';
 
 export const createUserSchema = Joi.object({
@@ -16,6 +23,7 @@ export const createUserSchema = Joi.object({
 // used to manually set a role for a user
 export class CreateFullUserDto {
   @IsAlphanumeric()
+  @MaxLength(30)
   @IsNotEmpty()
   username: string;
 
@@ -27,6 +35,8 @@ export class CreateFullUserDto {
   role: string;
 
   @IsString()
+  @MinLength(8)
+  @MaxLength(100)
   @IsNotEmpty()
   password: string;
 }

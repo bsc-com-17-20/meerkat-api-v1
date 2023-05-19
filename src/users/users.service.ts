@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './models/users.entity';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
@@ -41,7 +41,7 @@ export class UsersService {
     try {
       const { hash, ...user } = await this.userRepository.findOneBy({ id });
       if (!user) {
-        throw new Error(`User with id ${id} not found`);
+        throw new NotFoundException(`User not found`);
       }
       return user;
     } catch (error) {
@@ -54,7 +54,7 @@ export class UsersService {
       this.logger.log(username);
       const user = await this.userRepository.findOneBy({ username });
       if (!user) {
-        throw new Error(`User with username ${username} not found`);
+        throw new NotFoundException(`User with username ${username} not found`);
       }
       this.logger.log(user);
       return user;
