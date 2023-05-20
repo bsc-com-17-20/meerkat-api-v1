@@ -17,8 +17,8 @@ export class CreateUserDto {
   @IsNotEmpty()
   email: string;
 
-  @IsString()
-  role: string;
+  // @IsString()
+  // role: string;
 
   @IsString()
   @MinLength(8)
