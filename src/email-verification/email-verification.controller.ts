@@ -3,7 +3,7 @@ import { EmailVerificationService } from './email-verification.service';
 import { Public } from 'src/auth/decorators';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-@ApiTags('email-verification')
+@ApiTags('Email-verification')
 @Controller('email-verification')
 export class EmailVerificationController {
   constructor(

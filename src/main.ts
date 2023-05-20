@@ -43,7 +43,7 @@ async function bootstrap() {
     )
     .setVersion('1.0')
     .addTag(
-      'Auth',
+      'Authentication',
       'All about authentication and authorization, View a user profile. Use the login route first to access all routes',
     )
     .addTag('Users', 'Everything about the user')

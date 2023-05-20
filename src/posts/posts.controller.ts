@@ -28,7 +28,7 @@ import {
 } from '@nestjs/swagger';
 // import { JoiValidatorPipe } from '../utils/validation.pipe';
 
-@ApiTags('posts')
+@ApiTags('Posts')
 @Controller('posts')
 export class PostsController {
   constructor(private postsService: PostsService) {}

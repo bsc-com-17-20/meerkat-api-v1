@@ -28,7 +28,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-@ApiTags('replies')
+@ApiTags('Replies')
 @Controller('replies')
 export class RepliesController {
   logger = new Logger(RepliesController.name);

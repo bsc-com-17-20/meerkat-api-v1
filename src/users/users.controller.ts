@@ -28,7 +28,7 @@ import { RolesAuthGuard } from 'src/auth/guards';
 import { Public } from 'src/auth/decorators';
 import { User } from './models/users.entity';
 
-@ApiTags('users')
+@ApiTags('Users')
 @Controller('users')
 export class UsersController {
   logger = new Logger(UsersController.name);

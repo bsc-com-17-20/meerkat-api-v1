@@ -42,7 +42,6 @@ export class AuthController {
       'This route allows users to log in and obtain an authentication token (JWT).',
     operationId: 'login',
   })
-  @ApiBody({ description: 'User credentials for login' })
   @ApiResponse({
     status: 200,
     description: 'User logged in successfully',
@@ -76,7 +75,6 @@ export class AuthController {
       'This route allows users to register and create a new account.',
     operationId: 'createUser',
   })
-  @ApiBody({ description: 'User details for registration' })
   @ApiResponse({ status: 201, description: 'User registrated successfully' })
   @ApiResponse({ status: 400, description: 'Invalid request payload' })
   @ApiResponse({ status: 405, description: 'Internal server error' })

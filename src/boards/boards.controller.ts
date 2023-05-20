@@ -65,7 +65,6 @@ export class BoardsController {
     description: 'This route allows creating a new board',
     operationId: 'createBoard',
   })
-  @ApiBody({ description: 'Board details for creation' })
   @ApiResponse({ status: 201, description: 'Board created successfully' })
   @ApiResponse({ status: 400, description: 'Invalid request payload' })
   @ApiResponse({ status: 401, description: 'Unauthorized operation' })
@@ -91,7 +90,6 @@ export class BoardsController {
       'This route allows updating the details of a specific board identified by its boardId.',
     operationId: 'updateBoard',
   })
-  @ApiBody({ description: 'Updated board details' })
   @ApiResponse({ status: 200, description: 'Board updated successfully' })
   @ApiResponse({ status: 400, description: 'Invalid request payload' })
   @ApiResponse({ status: 401, description: 'Unauthorized operation' })
