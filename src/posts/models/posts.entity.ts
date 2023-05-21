@@ -29,10 +29,16 @@ export class Post {
   @Column({ default: false })
   edited: boolean;
 
-  @ManyToOne(() => Board, (board) => board.posts, { nullable: false })
+  @ManyToOne(() => Board, (board) => board.posts, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
   board: Board;
 
-  @ManyToOne(() => User, (user) => user.posts, { nullable: false })
+  @ManyToOne(() => User, (user) => user.posts, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
   user: User;
 
   @OneToMany(() => Reply, (reply) => reply.post, { cascade: true })

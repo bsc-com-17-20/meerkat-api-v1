@@ -1,9 +1,9 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { User } from '../users/models/users.entity';
-import { Status } from 'src/users/models/status.enum';
+import { Status } from '../users/models/status.enum';
 
 @Injectable()
 export class EmailVerificationService {
@@ -13,7 +13,12 @@ export class EmailVerificationService {
     private readonly mailService: MailerService,
   ) {}
 
-  async sendEmail(username: string, email: string, confimationCode: string) {
+  async sendConfirmationEmail(id: number) {
+    const user: User = await this.userRepository.findOneBy({ id });
+    const { username, email, confimationCode, status } = user;
+    if (status === Status.ACTIVE) {
+      return { msg: 'user is already active' };
+    }
     return this.mailService.sendMail({
       from: process.env.USER,
       to: email,
@@ -35,9 +40,13 @@ export class EmailVerificationService {
       if (!user) {
         throw new Error(`User with code ${confimationCode} not found`);
       }
-      user.status = Status.ACTIVE;
+      // user.status = Status.ACTIVE;
       this.logger.log({ ...user });
-      return this.userRepository.update({ id: user.id }, { ...user });
+      await this.userRepository.update(
+        { id: user.id },
+        { status: Status.ACTIVE },
+      );
+      return this.userRepository.findOneBy({ confimationCode });
     } catch (error) {
       throw new Error(
         `Error retrieving user with code ${confimationCode}: ${error.message}`,

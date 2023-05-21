@@ -19,9 +19,15 @@ export class Reply {
   @Column({ default: false })
   edited: boolean;
 
-  @ManyToOne(() => Post, (post) => post.replies, { nullable: false })
+  @ManyToOne(() => Post, (post) => post.replies, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
   post: Post;
 
-  @ManyToOne(() => User, (user) => user.replies, { nullable: false })
+  @ManyToOne(() => User, (user) => user.replies, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
   user: User;
 }

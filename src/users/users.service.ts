@@ -8,18 +8,15 @@ import {
   ResponseUserDto,
   UpdateUserDto,
 } from './dtos';
-import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 import * as download from 'image-downloader';
 import { Role } from './models/role.enum';
-import { EmailVerificationService } from '../email-verification/email-verification.service';
 
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
-    private readonly emailVerificationService: EmailVerificationService,
   ) {}
 
   async fetchUsers(): Promise<ResponseUserDto[]> {
@@ -97,11 +94,6 @@ export class UsersService {
       const newUser = this.userRepository.create({ ...user });
       const savedUser = this.userRepository.save(newUser);
       await download.image(options);
-      this.emailVerificationService.sendEmail(
-        userDetails.username,
-        userDetails.email,
-        confimationCode,
-      );
       return savedUser;
     } catch (error) {
       throw new Error(`Error creating user: ${error.message}`);
@@ -139,11 +131,6 @@ export class UsersService {
       const newUser = this.userRepository.create({ ...user });
       const savedUser = this.userRepository.save(newUser);
       await download.image(options);
-      await this.emailVerificationService.sendEmail(
-        userDetails.username,
-        userDetails.email,
-        confimationCode,
-      );
       return savedUser;
     } catch (error) {
       throw new Error(`Error creating user: ${error.message}`);
