@@ -29,12 +29,12 @@ import {
 } from '@nestjs/swagger';
 
 @ApiTags('Replies')
-@Controller('replies')
+@Controller('/boards/:boardId/posts/:postId/replies')
 export class RepliesController {
   logger = new Logger(RepliesController.name);
   constructor(private readonly repliesService: RepliesService) {}
 
-  @Get(':id')
+  @Get()
   @ApiOperation({
     summary: 'List all replies under a post',
     description: 'Gets all replies using a user ID',
@@ -50,11 +50,11 @@ export class RepliesController {
   })
   @ApiResponse({ status: 405, description: 'Invalid input' })
   @ApiCookieAuth()
-  getRepliesByPostId(@Param('id', ParseIntPipe) id: number) {
-    this.repliesService.fetchAllReplies(id);
+  getRepliesByPostId(@Param('postId', ParseIntPipe) postId: number) {
+    this.repliesService.fetchAllReplies(postId);
   }
 
-  @Post(':id')
+  @Post()
   // @UsePipes(new JoiValidatorPipe(createReplySchema))
   @ApiOperation({
     summary: 'Add a new reply',
@@ -74,7 +74,7 @@ export class RepliesController {
   // Do not use @Params() it is confilcting with the JoiValidator and messing up the validation use
   // manual req.params instead
   async createReply(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('postId', ParseIntPipe) postId: number,
     @Body() createReplyDto: CreateReplyDto,
     @Req() req,
   ) {
@@ -83,7 +83,7 @@ export class RepliesController {
       const userId = req.user.id;
       const response = await this.repliesService.createReply(
         createReplyDto,
-        id,
+        postId,
         userId,
       );
       delete response.user.hash;
@@ -100,7 +100,7 @@ export class RepliesController {
     }
   }
 
-  @Patch(':postId/:replyId')
+  @Patch(':replyId')
   @ApiOperation({
     summary: 'Updates a reply with form data',
     description: 'Updates a reply under a post (post ID)',
@@ -142,7 +142,7 @@ export class RepliesController {
     }
   }
 
-  @Delete(':id')
+  @Delete(':replyId')
   @ApiOperation({
     summary: 'Delete a reply',
     description: 'Deletes a reply using the replyID and userID',
@@ -158,10 +158,13 @@ export class RepliesController {
   })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
   @ApiCookieAuth()
-  async deleteReply(@Param('id', ParseIntPipe) id: number, @Req() req) {
+  async deleteReply(
+    @Param('replyId', ParseIntPipe) replyId: number,
+    @Req() req,
+  ) {
     try {
       const userId = req.user.id;
-      return await this.repliesService.deleteReply(id, userId);
+      return await this.repliesService.deleteReply(replyId, userId);
     } catch (error) {
       throw new InternalServerErrorException('Something went wrong', {
         cause: error,

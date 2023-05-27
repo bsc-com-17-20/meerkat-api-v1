@@ -199,18 +199,21 @@ export class PostsController {
   @Delete(':postId')
   @ApiOperation({
     summary: 'Delete a post',
-    description: 'Deletes a post using the post ID and user ID',
+    description: 'Deletes a post from using the post ID',
     operationId: 'deletePost',
   })
   @ApiResponse({
-    status: HttpStatus.CREATED,
-    description: 'Successful operation',
+    status: HttpStatus.NO_CONTENT,
+    description: 'Post deleted successfully',
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized operation',
   })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
   @ApiCookieAuth()
   async deleteReply(@Param('postId', ParseIntPipe) postId: number, @Req() req) {
     try {
