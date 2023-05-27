@@ -29,11 +29,11 @@ import {
 // import { JoiValidatorPipe } from '../utils/validation.pipe';
 
 @ApiTags('Posts')
-@Controller('posts')
+@Controller('/boards/:boardId/posts')
 export class PostsController {
   constructor(private postsService: PostsService) {}
 
-  @Get(':id')
+  @Get()
   @ApiOperation({
     summary: 'List all posts under a board',
     description: 'Gets all posts using a board id',
@@ -49,9 +49,9 @@ export class PostsController {
   })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
   @ApiCookieAuth()
-  async getAllPosts(@Param('id', ParseIntPipe) id: number) {
+  async getAllPosts(@Param('boardId', ParseIntPipe) boardId: number) {
     try {
-      return await this.postsService.fetchPostsByBoardId(id);
+      return await this.postsService.fetchPostsByBoardId(boardId);
     } catch (error) {
       throw new NotFoundException('Something went wrong', {
         cause: error,
@@ -60,7 +60,7 @@ export class PostsController {
     }
   }
 
-  @Get(':boardId/:postId')
+  @Get(':postId')
   @ApiOperation({
     summary: 'List a post under a board',
     description: 'Gets a post using a board id and post id',
@@ -76,9 +76,9 @@ export class PostsController {
   })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
   @ApiCookieAuth()
-  async getPostById(@Param('id', ParseIntPipe) id: number) {
+  async getPostById(@Param('postId', ParseIntPipe) postId: number) {
     try {
-      return await this.postsService.fetchPostByPostId(id);
+      return await this.postsService.fetchPostByPostId(postId);
     } catch (error) {
       throw new NotFoundException('Something went wrong', {
         cause: error,
@@ -87,27 +87,35 @@ export class PostsController {
     }
   }
 
-  @Post(':id')
+  @Post()
   @ApiOperation({
-    summary: 'Creates a posts on a board',
-    description: 'Creates a post using on a board using a board ID',
+    summary: 'Create a new post in a board',
+    description:
+      'This route allows creating a new post within a specific board.',
     operationId: 'createPost',
   })
   @ApiResponse({
     status: HttpStatus.CREATED,
-    description: 'Successful operation',
+    description: 'Post created successfully',
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
-    description: 'Unauthorized operation',
+    description: 'Unauthorized access',
   })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Board not found',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal Server Error',
+  })
   @ApiCookieAuth()
   // @UsePipes(new JoiValidatorPipe(createPostSchema))
   // Do not use @Params() it is confilcting with the JoiValidator and messing up the validation use
   // manual req.params instead
   async creatPost(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('boardId', ParseIntPipe) boardId: number,
     @Body() createPostDto: CreatePostDto,
     @Req() req,
   ) {
@@ -117,9 +125,10 @@ export class PostsController {
       const userId = req.user.id;
       const post = await this.postsService.createPost(
         createPostDto,
-        id,
+        boardId,
         userId,
       );
+      // remove sensitive info from public display
       delete post.user.hash;
       delete post.user.email;
       delete post.user.createdAt;
@@ -137,21 +146,29 @@ export class PostsController {
     }
   }
 
-  @Patch(':boardId/:postId')
+  @Patch(':postId')
   @ApiOperation({
-    summary: 'Updates a post',
-    description: 'Updates a post using the board ID and post ID',
+    summary: 'Update a post in a board',
+    description:
+      'This route allows updating the details of a specific post within a board.',
     operationId: 'updatePost',
   })
   @ApiResponse({
-    status: HttpStatus.CREATED,
-    description: 'Successful operation',
+    status: HttpStatus.OK,
+    description: 'Post updated successfully',
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
-    description: 'Unauthorized operation',
+    description: 'Unauthorized access',
   })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Board or post not found',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
   @ApiCookieAuth()
   // @UsePipes(new JoiValidatorPipe(editPostSchema))
   // Do not use @Params() it is confilcting with the JoiValidator and messing up the validation use
@@ -179,7 +196,7 @@ export class PostsController {
     }
   }
 
-  @Delete(':id')
+  @Delete(':postId')
   @ApiOperation({
     summary: 'Delete a post',
     description: 'Deletes a post using the post ID and user ID',
@@ -195,10 +212,10 @@ export class PostsController {
   })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
   @ApiCookieAuth()
-  async deleteReply(@Param('id', ParseIntPipe) id: number, @Req() req) {
+  async deleteReply(@Param('postId', ParseIntPipe) postId: number, @Req() req) {
     try {
       const userId = req.user.id;
-      return await this.postsService.deletePost(id, userId);
+      return await this.postsService.deletePost(postId, userId);
     } catch (error) {
       throw new InternalServerErrorException('Something went wrong', {
         cause: error,

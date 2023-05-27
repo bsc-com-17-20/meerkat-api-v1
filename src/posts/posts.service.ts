@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './models/posts.entity';
 import { Repository, UpdateResult } from 'typeorm';
@@ -64,6 +64,9 @@ export class PostsService {
   ): Promise<Post> {
     try {
       const board = await this.boardRepository.findOneBy({ id: boardId });
+      if (!board) {
+        throw new NotFoundException('Board not found');
+      }
       const user = await this.userRepositoty.findOneBy({ id: userId });
       const newPost = this.postRepository.create({
         ...postDetails,
@@ -88,6 +91,9 @@ export class PostsService {
       this.logger.log(ownership);
       if (ownership) {
         const board = await this.boardRepository.findOneBy({ id: boardId });
+        if (!board) {
+          throw new NotFoundException('Board not found');
+        }
         const user = await this.userRepositoty.findOneBy({ id: userId });
         return this.postRepository.update(
           { id },
