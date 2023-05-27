@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Reply } from './models/replies.entity';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
@@ -38,6 +38,9 @@ export class RepliesService {
     try {
       const user = await this.userRepository.findOneBy({ id: userId });
       const post = await this.postRepository.findOneBy({ id: postId });
+      if (!post) {
+        throw new NotFoundException(`Post with id ` + postId + ' is not found');
+      }
       const newReply = this.replyRepository.create({
         ...replyDetails,
         post,
@@ -61,6 +64,11 @@ export class RepliesService {
       if (ownership) {
         const user = await this.userRepository.findOneBy({ id: userId });
         const post = await this.postRepository.findOneBy({ id: postId });
+        if (!post) {
+          throw new NotFoundException(
+            `Post with id ` + postId + ' is not found',
+          );
+        }
         return this.replyRepository.update(
           { id: replyId },
           { ...replyDetails, updateAt: new Date(), edited: true, post, user },
