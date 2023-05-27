@@ -1,5 +1,5 @@
 import { MailerService } from '@nestjs-modules/mailer';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
 import { User } from '../users/models/users.entity';
@@ -15,6 +15,9 @@ export class EmailVerificationService {
 
   async sendConfirmationEmail(id: number) {
     const user: User = await this.userRepository.findOneBy({ id });
+    if (!user) {
+      throw new NotFoundException('User with id ' + id + ' is not found');
+    }
     const { username, email, confimationCode, status } = user;
     if (status === Status.ACTIVE) {
       return { msg: 'user is already active' };

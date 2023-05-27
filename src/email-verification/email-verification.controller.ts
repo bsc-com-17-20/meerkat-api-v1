@@ -1,34 +1,65 @@
-import { Controller, Get, Param, Req } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Param, Post, Req } from '@nestjs/common';
 import { EmailVerificationService } from './email-verification.service';
 import { Public } from '../auth/decorators';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Email-verification')
-@Controller('email-verification')
+@Controller('/users/email-verification')
 export class EmailVerificationController {
   constructor(
     private readonly emailVerificationService: EmailVerificationService,
   ) {}
 
-  @Public()
+  @Get('send')
   @ApiOperation({
-    summary: "Link sent to a user's email that activates a user's account",
+    summary: 'Send email verification link',
     description:
-      'link that upon clicking will send a get request with a confirmationCode param that sets a user account to active',
-    operationId: 'verifyUser',
+      "This route sends a verification link to the user's email account for email verification.",
+    operationId: 'sendConfirmationEmail',
   })
-  @ApiResponse({ status: 200, description: 'Confirmation success' })
-  @ApiResponse({ status: 401, description: 'Unauthorized operation' })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
-  @Get(':confimationCode')
-  async verifyUser(@Param('confirmationCode') confirmationCode: string) {
-    return await this.emailVerificationService.verifyUser(confirmationCode);
-  }
-
-  @Get()
-  async testUser(@Req() req) {
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Email verification link sent successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'User not found',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  async sendConfirmationEmail(@Req() req) {
     return await this.emailVerificationService.sendConfirmationEmail(
       req.user.id,
     );
+  }
+
+  @Public()
+  @ApiOperation({
+    summary: 'Verify email with confirmation code',
+    description:
+      "This route is triggered when the user clicks on the verification link sent to their email account. It changes the user's status from pending to active.",
+    operationId: 'verifyUser',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Email verified successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid confirmation code',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'User not found',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  @Get('verify/:confimationCode')
+  async verifyUser(@Param('confirmationCode') confirmationCode: string) {
+    return await this.emailVerificationService.verifyUser(confirmationCode);
   }
 }
