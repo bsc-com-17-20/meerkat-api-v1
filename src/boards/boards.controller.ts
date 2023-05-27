@@ -22,7 +22,6 @@ import {
   editBoardSchema,
 } from './dtos';
 import {
-  ApiBody,
   ApiCookieAuth,
   ApiOperation,
   ApiParam,

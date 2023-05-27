@@ -5,6 +5,8 @@ import { User } from './models/users.entity';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { CreateUserDto, ResponseUserDto, UpdateUserDto } from './dtos';
 import * as download from 'image-downloader';
+import { Status } from './models/status.enum';
+import { Role } from './models/role.enum';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -54,9 +56,10 @@ describe('UsersService', () => {
         email: 'john@email.com',
         imageURL: expect.any(String),
         hash: expect.any(String),
+        confimationCode: expect.any(String),
       };
 
-      const expectedSpyResult = {
+      const expectedSpyResult: User = {
         id: expect.any(Number),
         username: 'john',
         email: 'john@email.com',
@@ -66,7 +69,9 @@ describe('UsersService', () => {
         replies: [],
         createdAt: new Date(),
         updatedAt: new Date(),
-        role: 'user',
+        confimationCode: expect.any(String),
+        role: Role.USER,
+        status: Status.PENDING,
       };
 
       const downloadResult: download.DownloadResult = {
@@ -104,7 +109,7 @@ describe('UsersService', () => {
     it('should return a user object using an id', async () => {
       const expectedSpyResult: ResponseUserDto = {
         id: 1,
-        role: expect.any(String),
+        role: expect.any(Role),
         username: expect.any(String),
         email: expect.any(String),
         imageURL: expect.any(String),
@@ -112,10 +117,12 @@ describe('UsersService', () => {
         updatedAt: expect.any(Date),
         posts: [],
         replies: [],
+        status: expect.any(Status),
+        confimationCode: expect.any(String),
       };
       const expectedFindSpyResult: User = {
         id: 1,
-        role: expect.any(String),
+        role: expect.any(Role),
         username: expect.any(String),
         email: expect.any(String),
         hash: expect.any(String),
@@ -124,6 +131,8 @@ describe('UsersService', () => {
         updatedAt: expect.any(Date),
         posts: [],
         replies: [],
+        confimationCode: expect.any(String),
+        status: expect.any(Status),
       };
       const findOneBySpy = jest
         .spyOn(userRepository, 'findOneBy')
@@ -147,6 +156,8 @@ describe('UsersService', () => {
         updatedAt: expect.any(Date),
         posts: [],
         replies: [],
+        confimationCode: expect.any(String),
+        status: Status.PENDING,
       };
       const findOneBySpy = jest
         .spyOn(userRepository, 'findOneBy')
@@ -166,7 +177,7 @@ describe('UsersService', () => {
       };
       const expectedFetchUserSpyResult: ResponseUserDto = {
         id: 1,
-        role: expect.any(String),
+        role: expect.any(Role),
         username: expect.any(String),
         email: expect.any(String),
         imageURL: expect.any(String),
@@ -174,6 +185,8 @@ describe('UsersService', () => {
         updatedAt: expect.any(Date),
         posts: [],
         replies: [],
+        status: expect.any(Status),
+        confimationCode: expect.any(String),
       };
       const expectedSpyResult: UpdateResult = {
         raw: [],
@@ -209,6 +222,8 @@ describe('UsersService', () => {
         updatedAt: expect.any(Date),
         posts: [],
         replies: [],
+        confimationCode: expect.any(String),
+        status: Status.PENDING,
       };
       const expectedSpyResult: DeleteResult = {
         raw: [],

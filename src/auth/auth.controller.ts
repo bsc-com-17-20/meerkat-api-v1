@@ -15,7 +15,6 @@ import {
 import { LocalAuthGuard } from './guards';
 import { AuthService } from './auth.service';
 import {
-  ApiBody,
   ApiCookieAuth,
   ApiOperation,
   ApiResponse,

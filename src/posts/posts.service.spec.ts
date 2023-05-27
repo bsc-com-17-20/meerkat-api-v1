@@ -27,6 +27,8 @@ const expectedUser: User = {
   updatedAt: expect.any(Date),
   posts: [],
   replies: [],
+  confimationCode: expect.any(String),
+  status: expect.any(String),
 };
 
 describe('PostsService', () => {

@@ -32,6 +32,8 @@ const expectedUser: User = {
   updatedAt: expect.any(Date),
   posts: [],
   replies: [],
+  confimationCode: expect.any(String),
+  status: expect.any(String),
 };
 
 const replyDetails: CreateReplyDto = {
@@ -104,55 +106,70 @@ describe('RepliesService', () => {
       expect(findSpy).toBeCalledWith({ where: { post: { id: 1 } } });
       expect(result).toEqual(expectedResult);
     });
+  });
 
-    describe('createReply', () => {
-      it('should create a reply and return a reply object', async () => {
-        const expectedReply: Reply = {
-          id: expect.any(Number),
-          content: expect.any(String),
-          createdAt: expect.any(Date),
-          updateAt: expect.any(Date),
-          edited: false,
-          post: expect.any(Post),
-          user: expect.any(User),
-        };
+  describe('createReply', () => {
+    it('should create a reply and return a reply object', async () => {
+      const expectedReply: Reply = {
+        id: expect.any(Number),
+        content: expect.any(String),
+        createdAt: expect.any(Date),
+        updateAt: expect.any(Date),
+        edited: false,
+        post: expect.any(Post),
+        user: expect.any(User),
+      };
 
-        const createSpy = jest
-          .spyOn(replyRepository, 'create')
-          .mockReturnValue(expectedReply);
-        const saveSpy = jest
-          .spyOn(replyRepository, 'save')
-          .mockResolvedValue(expectedReply);
-        const result: Reply = await service.createReply(replyDetails, 1, 1);
-        expect(createSpy).toBeCalled();
-        expect(saveSpy).toBeCalled();
-        expect(result).toEqual(expectedReply);
-      });
-    });
-
-    describe('updateReply', () => {
-      it('should update a reply and return an UpdateResult object', async () => {
-        const expectedResult: UpdateResult = {
-          raw: [],
-          generatedMaps: [],
-          affected: 1,
-        };
-        jest.spyOn(service, 'checkUserOwnership').mockResolvedValue(true);
-        const updateSpy = jest
-          .spyOn(replyRepository, 'update')
-          .mockResolvedValue(expectedResult);
-        const result: UpdateResult = await service.updateReply(
-          replyDetails,
-          1,
-          1,
-          1,
-        );
-        expect(updateSpy).toBeCalled();
-        expect(result).toEqual(expectedResult);
-      });
+      const findOneByUserSpy = jest
+        .spyOn(userRepository, 'findOneBy')
+        .mockResolvedValue(expectedUser);
+      const findOneByPostSpy = jest
+        .spyOn(postRepository, 'findOneBy')
+        .mockResolvedValue(expectedPost);
+      const createSpy = jest
+        .spyOn(replyRepository, 'create')
+        .mockReturnValue(expectedReply);
+      const saveSpy = jest
+        .spyOn(replyRepository, 'save')
+        .mockResolvedValue(expectedReply);
+      const result: Reply = await service.createReply(replyDetails, 1, 1);
+      expect(findOneByUserSpy).toBeCalled();
+      expect(findOneByPostSpy).toBeCalled();
+      expect(createSpy).toBeCalled();
+      expect(saveSpy).toBeCalled();
+      expect(result).toEqual(expectedReply);
     });
   });
 
+  describe('updateReply', () => {
+    it('should update a reply and return an UpdateResult object', async () => {
+      const expectedResult: UpdateResult = {
+        raw: [],
+        generatedMaps: [],
+        affected: 1,
+      };
+      jest.spyOn(service, 'checkUserOwnership').mockResolvedValue(true);
+      const findOneByUserSpy = jest
+        .spyOn(userRepository, 'findOneBy')
+        .mockResolvedValue(expectedUser);
+      const findOneByPostSpy = jest
+        .spyOn(postRepository, 'findOneBy')
+        .mockResolvedValue(expectedPost);
+      const updateSpy = jest
+        .spyOn(replyRepository, 'update')
+        .mockResolvedValue(expectedResult);
+      const result: UpdateResult = await service.updateReply(
+        replyDetails,
+        1,
+        1,
+        1,
+      );
+      expect(findOneByUserSpy).toBeCalled();
+      expect(findOneByPostSpy).toBeCalled();
+      expect(updateSpy).toBeCalled();
+      expect(result).toEqual(expectedResult);
+    });
+  });
   describe('deleteReply', () => {
     it('should delete a reply and return a DeleteResult object', async () => {
       const expectedResult: DeleteResult = {

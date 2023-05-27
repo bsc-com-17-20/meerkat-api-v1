@@ -1,3 +1,5 @@
+import { Status } from '../../users/models/status.enum';
+
 export class RequestUserDto {
   id: string;
   role: string;
@@ -6,6 +8,8 @@ export class RequestUserDto {
   imageURL: string;
   createAt: Date;
   updatedAt: Date;
+  status: string;
+  confimationCode: string;
 }
 
 // {

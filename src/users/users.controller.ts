@@ -24,8 +24,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { JoiValidatorPipe } from '../utils/validation.pipe';
-import { RolesAuthGuard } from 'src/auth/guards';
-import { Public } from 'src/auth/decorators';
+import { RolesAuthGuard } from '../auth/guards';
+import { Public } from '../auth/decorators';
 import { User } from './models/users.entity';
 
 @ApiTags('Users')

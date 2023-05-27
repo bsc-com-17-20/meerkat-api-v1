@@ -54,8 +54,10 @@ describe('AuthService', () => {
         updatedAt: expect.any(Date),
         posts: [],
         replies: [],
+        confimationCode: expect.any(String),
+        status: expect.any(String),
       };
-      const expectedValidateUserSpyResult: ResponseUserDto = {
+      const expectedValidateUserSpyResult = {
         id: expect.any(Number),
         role: expect.any(String),
         username: 'john',
@@ -65,6 +67,8 @@ describe('AuthService', () => {
         updatedAt: expect.any(Date),
         posts: [],
         replies: [],
+        status: expect.any(String),
+        confimationCode: expect.any(String),
       };
       const findOneSpy = jest
         .spyOn(usersService, 'findOne')
@@ -89,6 +93,8 @@ describe('AuthService', () => {
         imageURL: expect.any(String),
         createAt: expect.any(Date),
         updatedAt: expect.any(Date),
+        confimationCode: expect.any(String),
+        status: expect.any(String),
       };
       const expectedResult = {
         access_token: expect.any(String),
