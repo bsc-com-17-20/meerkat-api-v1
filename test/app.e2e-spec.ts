@@ -17,6 +17,8 @@ import { RepliesModule } from '../src/replies/replies.module';
 import { UsersModule } from '../src/users/users.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from '../src/auth/guards';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { EmailVerificationModule } from '../src/email-verification/email-verification.module';
 
 const account: LoginUserDto = {
   username: 'dennis23',
@@ -52,11 +54,23 @@ describe('App (e2e)', () => {
             synchronize: true,
           }),
         }),
+        MailerModule.forRoot({
+          transport: {
+            host: 'smtp.gmail.com',
+            port: 587,
+            secure: false,
+            auth: {
+              user: process.env.USER,
+              pass: process.env.PASS,
+            },
+          },
+        }),
         UsersModule,
         BoardsModule,
         PostsModule,
         AuthModule,
         RepliesModule,
+        EmailVerificationModule,
       ],
       providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
     }).compile();
