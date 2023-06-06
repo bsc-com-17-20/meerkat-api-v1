@@ -57,6 +57,7 @@ async function bootstrap() {
       'Email-verification',
       'Route used by a user to activatate their account',
     )
+    .addCookieAuth('token')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

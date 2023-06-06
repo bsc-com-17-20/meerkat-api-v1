@@ -1,4 +1,4 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsAlphanumeric,
   IsEmail,
@@ -23,6 +23,7 @@ export const updateUserSchema = Joi.object({
 
 export class UpdateUserDto {
   @ApiPropertyOptional()
+  @ApiProperty({ example: 'user8', required: false })
   @IsString()
   @IsAlphanumeric()
   @MinLength(3)
@@ -31,12 +32,14 @@ export class UpdateUserDto {
   username: string;
 
   @ApiPropertyOptional()
+  @ApiProperty({ example: 'your@email.com', required: false })
   @IsString()
   @IsEmail()
   @IsOptional()
   email: string;
 
   @ApiPropertyOptional()
+  @ApiProperty({ example: '12345678910', required: false })
   @IsString()
   @IsAlphanumeric()
   @MinLength(8)

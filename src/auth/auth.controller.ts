@@ -42,8 +42,9 @@ export class AuthController {
     operationId: 'login',
   })
   @ApiResponse({
-    status: 200,
-    description: 'User logged in successfully',
+    status: HttpStatus.CREATED,
+    description:
+      'User logged in successfully: The userID and roleID is returned in a cookie named `token`. You need to include this cookie in subsequent requests. The token is automatically sent with each subsequent request',
   })
   @ApiResponse({ status: 400, description: 'Invalid request payload' })
   @ApiResponse({ status: 401, description: 'Unauthorized login attemp' })

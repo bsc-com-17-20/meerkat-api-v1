@@ -43,7 +43,7 @@ export class EmailVerificationController {
         req.user.id,
       );
     } catch (error) {
-      throw new InternalServerErrorException('SOmething went wrong');
+      throw new InternalServerErrorException('Something went wrong');
     }
   }
 
