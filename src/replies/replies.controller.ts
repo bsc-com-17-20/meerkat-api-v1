@@ -3,9 +3,11 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
   HttpStatus,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
   Param,
   ParseIntPipe,
   Patch,
@@ -59,7 +61,18 @@ export class RepliesController {
   })
   @ApiCookieAuth()
   getRepliesByPostId(@Param('postId', ParseIntPipe) postId: number) {
-    this.repliesService.fetchAllReplies(postId);
+    try {
+      return this.repliesService.fetchAllReplies(postId);
+    } catch (error) {
+      // throw new NotFoundException('Something went wrong', {
+      //   cause: error,
+      //   description: `${error.message}`,
+      // });
+      throw new HttpException(
+        'Something went wrong',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   @Post()

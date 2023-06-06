@@ -1,5 +1,10 @@
 import { MailerService } from '@nestjs-modules/mailer';
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
 import { User } from '../users/models/users.entity';
@@ -14,26 +19,30 @@ export class EmailVerificationService {
   ) {}
 
   async sendConfirmationEmail(id: number) {
-    const user: User = await this.userRepository.findOneBy({ id });
-    if (!user) {
-      throw new NotFoundException('User with id ' + id + ' is not found');
+    try {
+      const user: User = await this.userRepository.findOneBy({ id });
+      if (!user) {
+        throw new NotFoundException('User with id ' + id + ' is not found');
+      }
+      const { username, email, confimationCode, status } = user;
+      if (status === Status.ACTIVE) {
+        return { msg: 'user is already active' };
+      }
+      return this.mailService.sendMail({
+        from: process.env.USER,
+        to: email,
+        subject: 'Please confirm your account',
+        html: `<h1>Email Confirmation</h1>
+              <h2>Hello ${username}</h2>
+              <div>
+              <p>Thank you for creating an account. Please confirm your email by clicking the following link</p>
+              <a href=http://localhost:3000/email-verification/${confimationCode}> Click here</a>
+              </div>
+              `,
+      });
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
     }
-    const { username, email, confimationCode, status } = user;
-    if (status === Status.ACTIVE) {
-      return { msg: 'user is already active' };
-    }
-    return this.mailService.sendMail({
-      from: process.env.USER,
-      to: email,
-      subject: 'Please confirm your account',
-      html: `<h1>Email Confirmation</h1>
-            <h2>Hello ${username}</h2>
-            <div>
-            <p>Thank you for creating an account. Please confirm your email by clicking the following link</p>
-            <a href=http://localhost:3000/email-verification/${confimationCode}> Click here</a>
-            </div>
-            `,
-    });
   }
 
   async verifyUser(confimationCode: string) {
@@ -41,7 +50,9 @@ export class EmailVerificationService {
       const user = await this.userRepository.findOneBy({ confimationCode });
       this.logger.log({ ...user });
       if (!user) {
-        throw new Error(`User with code ${confimationCode} not found`);
+        throw new NotFoundException(
+          `User with code ${confimationCode} not found`,
+        );
       }
       // user.status = Status.ACTIVE;
       this.logger.log({ ...user });
@@ -51,9 +62,7 @@ export class EmailVerificationService {
       );
       return this.userRepository.findOneBy({ confimationCode });
     } catch (error) {
-      throw new Error(
-        `Error retrieving user with code ${confimationCode}: ${error.message}`,
-      );
+      throw new HttpException(error.message, error.status);
     }
   }
 }

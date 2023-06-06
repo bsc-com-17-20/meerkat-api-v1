@@ -1,4 +1,12 @@
-import { Controller, Get, HttpStatus, Param, Post, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpStatus,
+  InternalServerErrorException,
+  Param,
+  Post,
+  Req,
+} from '@nestjs/common';
 import { EmailVerificationService } from './email-verification.service';
 import { Public } from '../auth/decorators';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -30,9 +38,13 @@ export class EmailVerificationController {
     description: 'Internal server error',
   })
   async sendConfirmationEmail(@Req() req) {
-    return await this.emailVerificationService.sendConfirmationEmail(
-      req.user.id,
-    );
+    try {
+      return await this.emailVerificationService.sendConfirmationEmail(
+        req.user.id,
+      );
+    } catch (error) {
+      throw new InternalServerErrorException('SOmething went wrong');
+    }
   }
 
   @Public()
@@ -60,6 +72,10 @@ export class EmailVerificationController {
   })
   @Get('verify/:confimationCode')
   async verifyUser(@Param('confirmationCode') confirmationCode: string) {
-    return await this.emailVerificationService.verifyUser(confirmationCode);
+    try {
+      return await this.emailVerificationService.verifyUser(confirmationCode);
+    } catch (error) {
+      throw new InternalServerErrorException('Something went wrong');
+    }
   }
 }

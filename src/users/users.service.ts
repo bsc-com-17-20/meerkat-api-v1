@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './models/users.entity';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
@@ -30,7 +35,7 @@ export class UsersService {
       });
       return retUsers;
     } catch (error) {
-      throw new Error(`Error retrieving users: ${error.message}`);
+      throw new HttpException(error.message, error.status);
     }
   }
 
@@ -42,7 +47,7 @@ export class UsersService {
       }
       return user;
     } catch (error) {
-      throw new Error(`Error retrieving user with id ${id}: ${error.message}`);
+      throw new HttpException(error.message, error.status);
     }
   }
 
@@ -56,9 +61,7 @@ export class UsersService {
       this.logger.log(user);
       return user;
     } catch (error) {
-      throw new Error(
-        `Error retrieving user with username ${username}: ${error.message}`,
-      );
+      throw new HttpException(error.message, error.status);
     }
   }
 
@@ -96,7 +99,7 @@ export class UsersService {
       await download.image(options);
       return savedUser;
     } catch (error) {
-      throw new Error(`Error creating user: ${error.message}`);
+      throw new HttpException(error.message, error.status);
     }
   }
 
@@ -133,7 +136,7 @@ export class UsersService {
       await download.image(options);
       return savedUser;
     } catch (error) {
-      throw new Error(`Error creating user: ${error.message}`);
+      throw new HttpException(error.message, error.status);
     }
   }
 
@@ -148,7 +151,7 @@ export class UsersService {
         { ...updateUserDetails, updatedAt: new Date() },
       );
     } catch (error) {
-      throw new Error(`Error updating user with id ${id}: ${error.message}`);
+      throw new HttpException(error.message, error.status);
     }
   }
 
@@ -157,9 +160,7 @@ export class UsersService {
       await this.findOne(username);
       return this.userRepository.delete({ username });
     } catch (error) {
-      throw new Error(
-        `Error deleting user with id: ${username}: ${error.message}`,
-      );
+      throw new HttpException(error.message, error.status);
     }
   }
 }

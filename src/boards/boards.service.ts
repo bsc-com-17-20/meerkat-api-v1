@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Board } from './model/boards.entity';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
@@ -15,7 +15,7 @@ export class BoardsService {
       const boards = this.boardRepository.find();
       return boards;
     } catch (error) {
-      throw new Error(`Error retrieving users: ${error.message}`);
+      throw new HttpException(error.message, error.status);
     }
   }
 
@@ -24,7 +24,7 @@ export class BoardsService {
       const newBoard = this.boardRepository.create({ ...boardDetails });
       return this.boardRepository.save(newBoard);
     } catch (error) {
-      throw new Error(`Error creating a board: ${error.message}`);
+      throw new HttpException(error.message, error.status);
     }
   }
 
@@ -35,7 +35,7 @@ export class BoardsService {
     try {
       return this.boardRepository.update({ id }, { ...boardDetails });
     } catch (error) {
-      throw new Error(`Error updating board with id ${id}: ${error.message}`);
+      throw new HttpException(error.message, error.status);
     }
   }
 
@@ -43,7 +43,7 @@ export class BoardsService {
     try {
       return this.boardRepository.delete({ id });
     } catch (error) {
-      throw new Error(`Error retrieving users: ${error.message}`);
+      throw new HttpException(error.message, error.status);
     }
   }
 }

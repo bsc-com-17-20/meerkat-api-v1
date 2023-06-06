@@ -1,4 +1,10 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  HttpException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './models/posts.entity';
 import { Repository, UpdateResult } from 'typeorm';
@@ -25,9 +31,7 @@ export class PostsService {
         },
       });
     } catch (error) {
-      throw new Error(
-        `Error retrieving posts from board with id ${boardId}: ${error.message}`,
-      );
+      throw new HttpException(error.message, error.status);
     }
   }
 
@@ -41,7 +45,7 @@ export class PostsService {
         },
       });
     } catch (error) {
-      throw new Error(`Error retrieving users: ${error.message}`);
+      throw new HttpException(error.message, error.status);
     }
   }
 
@@ -53,7 +57,7 @@ export class PostsService {
         },
       });
     } catch (error) {
-      throw new Error(`Error retrieving users: ${error.message}`);
+      throw new HttpException(error.message, error.status);
     }
   }
 
@@ -76,7 +80,7 @@ export class PostsService {
       this.logger.log(newPost);
       return this.postRepository.save(newPost);
     } catch (error) {
-      throw new Error(`Error creating a posts: ${error.message}`);
+      throw new HttpException(error.message, error.status);
     }
   }
 
@@ -100,9 +104,11 @@ export class PostsService {
           { ...postDetails, updatedAt: new Date(), edited: true, board, user },
         );
       }
-      throw Error(`Error user does not own the post user id ${userId}`);
+      throw new ForbiddenException(
+        'User does not own the post user id: ' + userId,
+      );
     } catch (error) {
-      throw new Error(`Error updating post with id ${id}: ${error.message}`);
+      throw new HttpException(error.message, error.status);
     }
   }
 
@@ -112,11 +118,11 @@ export class PostsService {
       if (ownership) {
         return this.postRepository.delete({ id: postId });
       }
-      throw Error(`Error user does not own the post user id ${userId}`);
-    } catch (error) {
-      throw new Error(
-        `Error deleting post with id ${userId}: ${error.message}`,
+      throw new ForbiddenException(
+        `Error user does not own the post user id ${userId}`,
       );
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
     }
   }
 

@@ -1,4 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Reply } from './models/replies.entity';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
@@ -8,6 +15,7 @@ import { CreateReplyDto, EditReplyDto } from './dtos';
 
 @Injectable()
 export class RepliesService {
+  logger: Logger = new Logger(RepliesService.name);
   constructor(
     @InjectRepository(Reply) private replyRepository: Repository<Reply>,
     @InjectRepository(Post) private postRepository: Repository<Post>,
@@ -16,6 +24,14 @@ export class RepliesService {
 
   async fetchAllReplies(postId: number): Promise<Reply[]> {
     try {
+      const post = await this.postRepository.findOne({ where: { id: postId } });
+      if (!post) {
+        this.logger.log(post);
+        throw new HttpException(
+          `Post with id ` + postId + ' is not found',
+          HttpStatus.NOT_FOUND,
+        );
+      }
       return this.replyRepository.find({
         where: {
           post: {
@@ -24,9 +40,7 @@ export class RepliesService {
         },
       });
     } catch (error) {
-      throw new Error(
-        `Error retrieving posts from board with id ${postId}: ${error.message}`,
-      );
+      throw new HttpException(error.message, error.status);
     }
   }
 
@@ -49,7 +63,7 @@ export class RepliesService {
       await this.replyRepository.save(newReply);
       return newReply;
     } catch (error) {
-      throw new Error(`Error creating a reply: ${error.message}`);
+      throw new HttpException(error.message, error.status);
     }
   }
 
@@ -74,11 +88,11 @@ export class RepliesService {
           { ...replyDetails, updateAt: new Date(), edited: true, post, user },
         );
       }
-      throw Error(`Error user does not own the reply user id ${userId}`);
-    } catch (error) {
-      throw new Error(
-        `Error updating reply from post with id ${postId}: ${error.message}`,
+      throw new ForbiddenException(
+        `Error user does not own the reply user id ${userId}`,
       );
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
     }
   }
 
@@ -88,11 +102,11 @@ export class RepliesService {
       if (ownership) {
         return this.replyRepository.delete({ id: replyId });
       }
-      throw Error(`Error user does not own the reply user id ${userId}`);
-    } catch (error) {
-      throw new Error(
-        `Error deleting reply with id ${replyId}: ${error.message}`,
+      throw new ForbiddenException(
+        `Error user does not own the reply user id ${userId}`,
       );
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
     }
   }
 
@@ -112,7 +126,7 @@ export class RepliesService {
       }
       return true;
     } catch (error) {
-      throw new Error('Something went wrong');
+      throw new HttpException(error.message, error.status);
     }
   }
 }
