@@ -31,7 +31,6 @@ export class CreateFullUserDto {
   @IsNotEmpty()
   username: string;
 
-  @ApiProperty({ example: 'your@email.com' })
   @IsEmail()
   @IsNotEmpty()
   email: string;

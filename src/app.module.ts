@@ -32,7 +32,7 @@ import { EmailVerificationModule } from './email-verification/email-verification
         migrations: [
           /*...*/
         ],
-        synchronize: true,
+        synchronize: false,
       }),
     }),
     ThrottlerModule.forRootAsync({
