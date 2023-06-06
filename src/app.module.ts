@@ -22,12 +22,12 @@ import { EmailVerificationModule } from './email-verification/email-verification
     TypeOrmModule.forRootAsync({
       useFactory: () => ({
         type: 'mysql',
-        url: process.env.DATABASE_URL,
-        // host: process.env.DATABASE_HOST,
-        // port: 3306,
-        // username: process.env.DATABASE_USER,
-        // password: process.env.DATABASE_PASSWORD,
-        // database: process.env.DATABASE_NAME,
+        // url: process.env.DATABASE_URL,
+        host: process.env.DATABASE_HOST,
+        port: 3306,
+        username: process.env.DATABASE_USER,
+        password: process.env.DATABASE_PASSWORD,
+        database: process.env.DATABASE_NAME,
         entities: [User, Board, Post, Reply],
         migrations: [
           /*...*/
