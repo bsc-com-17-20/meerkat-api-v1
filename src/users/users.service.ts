@@ -94,7 +94,10 @@ export class UsersService {
         confimationCode: confimationCode,
       };
       this.logger.log({ ...user });
-      const newUser = this.userRepository.create({ ...user });
+      const newUser = this.userRepository.create({
+        ...user,
+        updatedAt: new Date(),
+      });
       const savedUser = this.userRepository.save(newUser);
       await download.image(options);
       return savedUser;
@@ -131,7 +134,10 @@ export class UsersService {
         confimationCode: confimationCode,
       };
       this.logger.log({ ...user });
-      const newUser = this.userRepository.create({ ...user });
+      const newUser = this.userRepository.create({
+        ...user,
+        updatedAt: new Date(),
+      });
       const savedUser = this.userRepository.save(newUser);
       await download.image(options);
       return savedUser;

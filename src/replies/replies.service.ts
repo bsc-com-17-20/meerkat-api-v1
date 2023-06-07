@@ -57,6 +57,7 @@ export class RepliesService {
       }
       const newReply = this.replyRepository.create({
         ...replyDetails,
+        updateAt: new Date(),
         post,
         user,
       });

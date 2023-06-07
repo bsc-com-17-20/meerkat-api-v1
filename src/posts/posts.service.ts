@@ -74,6 +74,7 @@ export class PostsService {
       const user = await this.userRepositoty.findOneBy({ id: userId });
       const newPost = this.postRepository.create({
         ...postDetails,
+        updatedAt: new Date(),
         board,
         user,
       });
