@@ -7,22 +7,14 @@ import {
   HttpStatus,
   InternalServerErrorException,
   Logger,
-  NotFoundException,
   Param,
   ParseIntPipe,
   Patch,
   Post,
   Req,
-  UsePipes,
 } from '@nestjs/common';
 import { RepliesService } from './replies.service';
-import {
-  CreateReplyDto,
-  EditReplyDto,
-  createReplySchema,
-  editReplySchema,
-} from './dtos';
-// import { JoiValidatorPipe } from '../utils/validation.pipe';
+import { CreateReplyDto, EditReplyDto } from './dtos';
 import {
   ApiCookieAuth,
   ApiOperation,
@@ -44,8 +36,21 @@ export class RepliesController {
     operationId: 'fetchAllReplies',
   })
   @ApiResponse({
-    status: HttpStatus.FOUND,
+    status: HttpStatus.OK,
     description: 'Reply found',
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: { type: 'number' },
+          content: { type: 'string' },
+          createdAt: { type: 'string' },
+          updatedAt: { type: 'string' },
+          edited: { type: 'boolean' },
+        },
+      },
+    },
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
@@ -76,7 +81,6 @@ export class RepliesController {
   }
 
   @Post()
-  // @UsePipes(new JoiValidatorPipe(createReplySchema))
   @ApiOperation({
     summary: 'Create a new reply in a post',
     description:
@@ -86,6 +90,16 @@ export class RepliesController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'Reply created successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'number' },
+        content: { type: 'string' },
+        createdAt: { type: 'string' },
+        updatedAt: { type: 'string' },
+        edited: { type: 'boolean' },
+      },
+    },
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -147,6 +161,14 @@ export class RepliesController {
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid request payload',
+    schema: {
+      type: 'object',
+      properties: {
+        raw: { type: 'any' },
+        affected: { type: 'number' },
+        generatedMaps: { type: 'array', items: { type: 'string' } },
+      },
+    },
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
@@ -173,11 +195,13 @@ export class RepliesController {
     try {
       // const { postId, replyId } = req.params;
       const userId = req.user.id;
+      const userRole = req.user.role;
       return await this.repliesService.updateReply(
         editReplyDto,
         replyId,
         postId,
         userId,
+        userRole,
       );
     } catch (error) {
       throw new InternalServerErrorException('Something went wrong', {
@@ -197,6 +221,13 @@ export class RepliesController {
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
     description: 'Reply deleted successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        raw: { type: 'any' },
+        affected: { type: 'number' },
+      },
+    },
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
@@ -217,7 +248,8 @@ export class RepliesController {
   ) {
     try {
       const userId = req.user.id;
-      return await this.repliesService.deleteReply(replyId, userId);
+      const userRole = req.user.role;
+      return await this.repliesService.deleteReply(replyId, userId, userRole);
     } catch (error) {
       throw new InternalServerErrorException('Something went wrong', {
         cause: error,

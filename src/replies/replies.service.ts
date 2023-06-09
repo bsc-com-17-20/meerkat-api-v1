@@ -12,6 +12,7 @@ import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { Post } from '../posts/models/posts.entity';
 import { User } from '../users/models/users.entity';
 import { CreateReplyDto, EditReplyDto } from './dtos';
+import { Role } from '../users/models/role.enum';
 
 @Injectable()
 export class RepliesService {
@@ -73,10 +74,11 @@ export class RepliesService {
     replyId: number,
     postId: number,
     userId: number,
+    userRole,
   ): Promise<UpdateResult> {
     try {
       const ownership = await this.checkUserOwnership(replyId, userId);
-      if (ownership) {
+      if (ownership || userRole == userRole) {
         const user = await this.userRepository.findOneBy({ id: userId });
         const post = await this.postRepository.findOneBy({ id: postId });
         if (!post) {
@@ -97,10 +99,14 @@ export class RepliesService {
     }
   }
 
-  async deleteReply(replyId: number, userId: number): Promise<DeleteResult> {
+  async deleteReply(
+    replyId: number,
+    userId: number,
+    userRole,
+  ): Promise<DeleteResult> {
     try {
       const ownership = await this.checkUserOwnership(replyId, userId);
-      if (ownership) {
+      if (ownership || userRole == Role.ADMIN) {
         return this.replyRepository.delete({ id: replyId });
       }
       throw new ForbiddenException(

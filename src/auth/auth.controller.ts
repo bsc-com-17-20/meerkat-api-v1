@@ -10,7 +10,6 @@ import {
   Request,
   Res,
   UseGuards,
-  UsePipes,
 } from '@nestjs/common';
 import { LocalAuthGuard } from './guards';
 import { AuthService } from './auth.service';
@@ -22,9 +21,8 @@ import {
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { Public } from './decorators';
-import { JoiValidatorPipe } from '../utils/validation.pipe';
-import { CreateUserDto, createUserSchema } from '../users/dtos';
-import { LoginUserDto, loginUserSchema } from './dtos';
+import { CreateUserDto } from '../users/dtos';
+import { LoginUserDto } from './dtos';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -45,11 +43,16 @@ export class AuthController {
     status: HttpStatus.CREATED,
     description:
       'User logged in successfully: The userID and roleID is returned in a cookie named `token`. You need to include this cookie in subsequent requests. The token is automatically sent with each subsequent request',
+    schema: {
+      type: 'object',
+      properties: {
+        access_token: { type: 'string' },
+      },
+    },
   })
   @ApiResponse({ status: 400, description: 'Invalid request payload' })
   @ApiResponse({ status: 401, description: 'Unauthorized login attemp' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
-  // @UsePipes(new JoiValidatorPipe(loginUserSchema))
   async login(
     @Body() loginUserDto: LoginUserDto,
     @Request() req,
@@ -72,13 +75,30 @@ export class AuthController {
   @ApiOperation({
     summary: 'User registration',
     description:
-      'This route allows users to register and create a new account.',
+      'This route allows users to register and create a new account.  You might get a TimeOut Error this is due to either slow internet cuase it uses an external API to create a profile Img or the hosting platform is slow, but nevertheless the user gets created',
     operationId: 'createUser',
   })
-  @ApiResponse({ status: 201, description: 'User registrated successfully' })
+  @ApiResponse({
+    status: 201,
+    description: 'User registrated successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'number' },
+        role: { type: 'string' },
+        username: { type: 'string' },
+        email: { type: 'string' },
+        imageURL: { type: 'string' },
+        createdAt: { type: 'string' },
+        updatedAt: { type: 'string' },
+        posts: { type: 'array' },
+        replies: { type: 'array' },
+        status: { type: 'string' },
+      },
+    },
+  })
   @ApiResponse({ status: 400, description: 'Invalid request payload' })
-  @ApiResponse({ status: 405, description: 'Internal server error' })
-  // @UsePipes(new JoiValidatorPipe(createUserSchema))
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   async register(@Body() createUserDto: CreateUserDto) {
     try {
       const user = await this.authService.register(createUserDto);
@@ -102,6 +122,20 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'User profile retrieved successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'number' },
+        role: { type: 'string' },
+        username: { type: 'string' },
+        email: { type: 'string' },
+        imageURL: { type: 'string' },
+        createdAt: { type: 'string' },
+        updatedAt: { type: 'string' },
+        status: { type: 'string' },
+        confirmationCode: { type: 'string' },
+      },
+    },
   })
   @ApiResponse({ status: 401, description: 'Unauthorized operation' })
   @ApiResponse({ status: 500, description: 'Internal server error' })

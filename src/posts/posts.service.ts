@@ -11,6 +11,7 @@ import { Repository, UpdateResult } from 'typeorm';
 import { CreatePostDto, EditPostDto } from './dtos';
 import { Board } from '../boards/model/boards.entity';
 import { User } from '../users/models/users.entity';
+import { Role } from '../users/models/role.enum';
 
 @Injectable()
 export class PostsService {
@@ -89,34 +90,34 @@ export class PostsService {
     id: number,
     postDetails: EditPostDto,
     boardId: number,
-    userId: number,
+    userReq,
   ): Promise<UpdateResult> {
     try {
-      const ownership = await this.checkUserOwnership(id, userId);
+      const ownership = await this.checkUserOwnership(id, userReq.id);
       this.logger.log(ownership);
-      if (ownership) {
+      if (ownership || userReq.role == Role.ADMIN) {
         const board = await this.boardRepository.findOneBy({ id: boardId });
         if (!board) {
           throw new NotFoundException('Board not found');
         }
-        const user = await this.userRepositoty.findOneBy({ id: userId });
+        const user = await this.userRepositoty.findOneBy({ id: userReq.id });
         return this.postRepository.update(
           { id },
           { ...postDetails, updatedAt: new Date(), edited: true, board, user },
         );
       }
       throw new ForbiddenException(
-        'User does not own the post user id: ' + userId,
+        'User does not own the post user id: ' + userReq.id,
       );
     } catch (error) {
       throw new HttpException(error.message, error.status);
     }
   }
 
-  async deletePost(postId: number, userId: number) {
+  async deletePost(postId: number, userId: number, userRole: string) {
     try {
       const ownership = await this.checkUserOwnership(postId, userId);
-      if (ownership) {
+      if (ownership || userRole == Role.ADMIN) {
         return this.postRepository.delete({ id: postId });
       }
       throw new ForbiddenException(
@@ -138,6 +139,7 @@ export class PostsService {
           },
         },
       });
+      this.logger.log(post);
       if (!post) {
         return false;
       }

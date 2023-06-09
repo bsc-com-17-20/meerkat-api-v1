@@ -29,21 +29,21 @@ export class UpdateUserDto {
   @MinLength(3)
   @MaxLength(30)
   @IsOptional()
-  username: string;
+  username?: string;
 
   @ApiPropertyOptional()
   @ApiProperty({ example: 'your@email.com', required: false })
   @IsString()
   @IsEmail()
   @IsOptional()
-  email: string;
+  email?: string;
 
-  @ApiPropertyOptional()
-  @ApiProperty({ example: '12345678910', required: false })
-  @IsString()
-  @IsAlphanumeric()
-  @MinLength(8)
-  @MaxLength(100)
-  @IsOptional()
-  password: string;
+  // @ApiPropertyOptional()
+  // @ApiProperty({ example: '12345678910', required: false })
+  // @IsString()
+  // @IsAlphanumeric()
+  // @MinLength(8)
+  // @MaxLength(100)
+  // @IsOptional()
+  // password?: string;
 }

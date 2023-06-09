@@ -11,22 +11,15 @@ import {
   Patch,
   Post,
   Req,
-  UsePipes,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import {
-  CreatePostDto,
-  EditPostDto,
-  createPostSchema,
-  editPostSchema,
-} from './dtos';
+import { CreatePostDto, EditPostDto } from './dtos';
 import {
   ApiCookieAuth,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-// import { JoiValidatorPipe } from '../utils/validation.pipe';
 
 @ApiTags('Posts')
 @Controller('/boards/:boardId/posts')
@@ -42,6 +35,20 @@ export class PostsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Successful operation',
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: { type: 'number' },
+          title: { type: 'string' },
+          content: { type: 'string' },
+          createdAt: { type: 'string' },
+          updatedAt: { type: 'string' },
+          edited: { type: 'boolean' },
+        },
+      },
+    },
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
@@ -69,6 +76,17 @@ export class PostsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Successful operation',
+    schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'number' },
+        title: { type: 'string' },
+        content: { type: 'string' },
+        createdAt: { type: 'string' },
+        updatedAt: { type: 'string' },
+        edited: { type: 'boolean' },
+      },
+    },
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
@@ -97,6 +115,17 @@ export class PostsController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'Post created successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'number' },
+        title: { type: 'string' },
+        content: { type: 'string' },
+        createdAt: { type: 'string' },
+        updatedAt: { type: 'string' },
+        edited: { type: 'boolean' },
+      },
+    },
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
@@ -156,6 +185,14 @@ export class PostsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Post updated successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        raw: { type: 'any' },
+        affected: { type: 'number' },
+        generatedMaps: { type: 'array', items: { type: 'string' } },
+      },
+    },
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
@@ -181,12 +218,12 @@ export class PostsController {
   ) {
     try {
       // const { boardId, postId } = req.params;
-      const userId = req.user.id;
+      const user = req.user;
       return await this.postsService.updatePost(
         postId,
         editPostDto,
         boardId,
-        userId,
+        user,
       );
     } catch (error) {
       throw new InternalServerErrorException('Something went wrong', {
@@ -205,6 +242,13 @@ export class PostsController {
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
     description: 'Post deleted successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        raw: { type: 'any' },
+        affected: { type: 'number' },
+      },
+    },
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
@@ -218,7 +262,8 @@ export class PostsController {
   async deleteReply(@Param('postId', ParseIntPipe) postId: number, @Req() req) {
     try {
       const userId = req.user.id;
-      return await this.postsService.deletePost(postId, userId);
+      const userRole = req.user.role;
+      return await this.postsService.deletePost(postId, userId, userRole);
     } catch (error) {
       throw new InternalServerErrorException('Something went wrong', {
         cause: error,

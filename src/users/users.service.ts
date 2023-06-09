@@ -77,6 +77,14 @@ export class UsersService {
 
   async createUser(userDetails: CreateUserDto): Promise<User> {
     try {
+      const userVal = await this.userRepository.findOneBy({
+        username: userDetails.username,
+      });
+      if (userVal) {
+        throw new NotFoundException(
+          `User with username ${userDetails.username} is already taken`,
+        );
+      }
       const options = {
         url: `https://api.dicebear.com/6.x/thumbs/svg?seed=${userDetails.username}`,
         dest: `../../public/avatars/${userDetails.username}.svg`,
@@ -108,6 +116,14 @@ export class UsersService {
 
   async createFullUser(userDetails: CreateFullUserDto): Promise<User> {
     try {
+      const userVal = await this.userRepository.findOneBy({
+        username: userDetails.username,
+      });
+      if (userVal) {
+        throw new NotFoundException(
+          `User with username ${userDetails.username} is already taken`,
+        );
+      }
       const options = {
         url: `https://api.dicebear.com/6.x/thumbs/svg?seed=${userDetails.username}`,
         dest: `../../public/avatars/${userDetails.username}.svg`,
@@ -147,24 +163,30 @@ export class UsersService {
   }
 
   async updateUser(
-    id: number,
+    role: string,
     updateUserDetails: UpdateUserDto,
+    username: string,
   ): Promise<UpdateResult> {
     try {
-      await this.fetchUser(id);
-      return this.userRepository.update(
-        { id },
-        { ...updateUserDetails, updatedAt: new Date() },
-      );
+      const user = await this.findOne(username);
+      if (user || role == Role.ADMIN) {
+        return this.userRepository.update(
+          { username },
+          { ...updateUserDetails, updatedAt: new Date() },
+        );
+      }
+      throw new NotFoundException(`User with username ${username} not found`);
     } catch (error) {
       throw new HttpException(error.message, error.status);
     }
   }
 
-  async deleteuser(username: string): Promise<DeleteResult> {
+  async deleteuser(role: string, username: string): Promise<DeleteResult> {
     try {
-      await this.findOne(username);
-      return this.userRepository.delete({ username });
+      const user = await this.findOne(username);
+      if (user || role == Role.ADMIN) {
+        return this.userRepository.delete({ username });
+      }
     } catch (error) {
       throw new HttpException(error.message, error.status);
     }

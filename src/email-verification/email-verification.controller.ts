@@ -57,6 +57,22 @@ export class EmailVerificationController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Email verified successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'number' },
+        role: { type: 'string' },
+        username: { type: 'string' },
+        email: { type: 'string' },
+        imageURL: { type: 'string' },
+        createdAt: { type: 'string' },
+        updatedAt: { type: 'string' },
+        posts: { type: 'array' },
+        replies: { type: 'array' },
+        status: { type: 'string' },
+        confirmationCode: { type: 'string' },
+      },
+    },
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -73,7 +89,11 @@ export class EmailVerificationController {
   @Get('verify/:confimationCode')
   async verifyUser(@Param('confirmationCode') confirmationCode: string) {
     try {
-      return await this.emailVerificationService.verifyUser(confirmationCode);
+      const user = await this.emailVerificationService.verifyUser(
+        confirmationCode,
+      );
+      delete user.hash;
+      return user;
     } catch (error) {
       throw new InternalServerErrorException('Something went wrong');
     }
