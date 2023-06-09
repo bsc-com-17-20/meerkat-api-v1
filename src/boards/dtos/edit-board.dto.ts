@@ -6,14 +6,14 @@ import {
   Max,
   IsOptional,
 } from 'class-validator';
-import * as Joi from 'joi';
+// import * as Joi from 'joi';
 
-export const editBoardSchema = Joi.object({
-  name: Joi.string().alphanum().min(3).max(30).optional(),
-  description: Joi.string().min(5).optional(),
-}).options({
-  abortEarly: false,
-});
+// export const editBoardSchema = Joi.object({
+//   name: Joi.string().alphanum().min(3).max(30).optional(),
+//   description: Joi.string().min(5).optional(),
+// }).options({
+//   abortEarly: false,
+// });
 
 export class EditBoardDto {
   @ApiProperty({ example: 'Food and nutrition', required: false })
