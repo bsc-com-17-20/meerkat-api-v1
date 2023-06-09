@@ -23,7 +23,7 @@ import {
 } from '@nestjs/swagger';
 
 @ApiTags('Replies')
-@Controller('/boards/:boardId/posts/:postId/replies')
+@Controller('/boards/posts/:postId/replies')
 export class RepliesController {
   logger = new Logger(RepliesController.name);
   constructor(private readonly repliesService: RepliesService) {}
@@ -164,7 +164,7 @@ export class RepliesController {
     schema: {
       type: 'object',
       properties: {
-        raw: { type: 'any' },
+        raw: { type: 'array', items: { type: 'string' } },
         affected: { type: 'number' },
         generatedMaps: { type: 'array', items: { type: 'string' } },
       },
@@ -224,7 +224,7 @@ export class RepliesController {
     schema: {
       type: 'object',
       properties: {
-        raw: { type: 'any' },
+        raw: { type: 'array', items: { type: 'string' } },
         affected: { type: 'number' },
       },
     },

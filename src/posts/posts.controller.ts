@@ -188,7 +188,7 @@ export class PostsController {
     schema: {
       type: 'object',
       properties: {
-        raw: { type: 'any' },
+        raw: { type: 'array', items: { type: 'string' } },
         affected: { type: 'number' },
         generatedMaps: { type: 'array', items: { type: 'string' } },
       },
@@ -245,7 +245,7 @@ export class PostsController {
     schema: {
       type: 'object',
       properties: {
-        raw: { type: 'any' },
+        raw: { type: 'array', items: { type: 'string' } },
         affected: { type: 'number' },
       },
     },

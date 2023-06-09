@@ -78,7 +78,7 @@ export class RepliesService {
   ): Promise<UpdateResult> {
     try {
       const ownership = await this.checkUserOwnership(replyId, userId);
-      if (ownership || userRole == userRole) {
+      if (ownership || userRole == Role.ADMIN) {
         const user = await this.userRepository.findOneBy({ id: userId });
         const post = await this.postRepository.findOneBy({ id: postId });
         if (!post) {
